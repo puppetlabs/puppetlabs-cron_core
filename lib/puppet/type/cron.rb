@@ -66,26 +66,26 @@ Puppet::Type.newtype(:cron) do
     # We have to override the parent method, because we consume the entire
     # "should" array
     def insync?(is)
-      self.is_to_s(is) == self.should_to_s
+      is_to_s(is) == should_to_s
     end
 
     # A method used to do parameter input handling.  Converts integers
     # in string form to actual integers, and returns the value if it's
     # an integer or false if it's just a normal string.
     def numfix(num)
-      if num =~ /^\d+$/
-        return num.to_i
+      if num =~ %r{^\d+$}
+        num.to_i
       elsif num.is_a?(Integer)
-        return num
+        num
       else
-        return false
+        false
       end
     end
 
     # Verify that a number is within the specified limits.  Return the
     # number if it is, or false if it is not.
     def limitcheck(num, lower, upper)
-      (num >= lower and num <= upper) && num
+      (num >= lower && num <= upper) && num
     end
 
     # Verify that a value falls within the specified array.  Does case
@@ -97,11 +97,11 @@ Puppet::Type.newtype(:cron) do
       # If they specified a shortened version of the name, then see
       # if we can lengthen it (e.g., mon => monday).
       if tmp.length == 3
-        ary.each_with_index { |name, index|
-          if tmp.upcase == name[0..2].upcase
+        ary.each_with_index do |name, index|
+          if tmp.casecmp(name[0..2]).zero?
             return index
           end
-        }
+        end
       else
         return ary.index(tmp) if ary.include?(tmp)
       end
@@ -132,7 +132,7 @@ Puppet::Type.newtype(:cron) do
     end
 
     def should
-      if @should and @should[0] == :absent
+      if @should && @should[0] == :absent
         :absent
       else
         @should
@@ -152,7 +152,7 @@ Puppet::Type.newtype(:cron) do
     munge do |value|
       # Support 'absent' as a value, so that they can remove
       # a value
-      if value == "absent" or value == :absent
+      if value == 'absent' || value == :absent
         return :absent
       end
 
@@ -162,7 +162,7 @@ Puppet::Type.newtype(:cron) do
       end
 
       # Allow ranges
-      if value =~ /^[0-9]+-[0-9]+$/
+      if value =~ %r{^[0-9]+-[0-9]+$}
         return value
       end
 
@@ -171,7 +171,7 @@ Puppet::Type.newtype(:cron) do
         return value
       end
 
-      if value == "*"
+      if value == '*'
         return :absent
       end
 
@@ -190,7 +190,7 @@ Puppet::Type.newtype(:cron) do
       if retval
         return retval.to_s
       else
-        self.fail _("%{value} is not a valid %{name}") % { value: value, name: self.class.name }
+        self.fail _('%{value} is not a valid %{name}') % { value: value, name: self.class.name }
       end
     end
   end
@@ -202,7 +202,7 @@ Puppet::Type.newtype(:cron) do
   #
   # Note that this means that managing many cron jobs for a given user
   # could currently result in multiple write sessions for that user.
-  newproperty(:command, :parent => CronParam) do
+  newproperty(:command, parent: CronParam) do
     desc "The command to execute in the cron job.  The environment
       provided to the command varies by local system rules, and it is
       best to always provide a fully qualified command.  The user's
@@ -224,7 +224,7 @@ Puppet::Type.newtype(:cron) do
         if @should.is_a? Array
           @should[0]
         else
-          devfail "command is not an array"
+          devfail 'command is not an array'
         end
       else
         nil
@@ -243,39 +243,39 @@ Puppet::Type.newtype(:cron) do
        Set to 'absent' to make puppet revert to a plain numeric schedule."
 
     def specials
-      %w{reboot yearly annually monthly weekly daily midnight hourly absent} +
-        [ :absent ]
+      ['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly', 'absent'] +
+        [:absent]
     end
 
     validate do |value|
-      raise ArgumentError, _("Invalid special schedule %{value}") % { value: value.inspect } unless specials.include?(value)
+      raise ArgumentError, _('Invalid special schedule %{value}') % { value: value.inspect } unless specials.include?(value)
     end
 
     def munge(value)
       # Support value absent so that a schedule can be
       # forced to change to numeric.
-      if value == "absent" or value == :absent
+      if value == 'absent' || value == :absent
         return :absent
       end
       value
     end
   end
 
-  newproperty(:minute, :parent => CronParam) do
+  newproperty(:minute, parent: CronParam) do
     self.boundaries = [0, 59]
     desc "The minute at which to run the cron job.
       Optional; if specified, must be between 0 and 59, inclusive."
   end
 
-  newproperty(:hour, :parent => CronParam) do
+  newproperty(:hour, parent: CronParam) do
     self.boundaries = [0, 23]
     desc "The hour at which to run the cron job. Optional;
       if specified, must be between 0 and 23, inclusive."
   end
 
-  newproperty(:weekday, :parent => CronParam) do
+  newproperty(:weekday, parent: CronParam) do
     def alpha
-      %w{sunday monday tuesday wednesday thursday friday saturday}
+      ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
     end
     self.boundaries = [0, 7]
     desc "The weekday on which to run the command. Optional; if specified,
@@ -285,14 +285,13 @@ Puppet::Type.newtype(:cron) do
       -   The name of the day, such as 'Tuesday'."
   end
 
-  newproperty(:month, :parent => CronParam) do
+  newproperty(:month, parent: CronParam) do
     def alpha
       # The ___placeholder accounts for the fact that month is unique among
       # "nameable" crontab entries in that it does not use 0-based indexing.
       # Padding the array with a placeholder introduces the appropriate shift
       # in indices.
-      %w{___placeholder january february march april may june july
-        august september october november december}
+      ['___placeholder', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
     end
     self.boundaries = [1, 12]
     desc "The month of the year. Optional; if specified,
@@ -302,7 +301,7 @@ Puppet::Type.newtype(:cron) do
       -   The name of the month, such as 'December'."
   end
 
-  newproperty(:monthday, :parent => CronParam) do
+  newproperty(:monthday, parent: CronParam) do
     self.boundaries = [1, 31]
     desc "The day of the month on which to run the
       command.  Optional; if specified, must be between 1 and 31."
@@ -325,26 +324,24 @@ Puppet::Type.newtype(:cron) do
       the crontab, like `PATH=/bin:/usr/bin:/usr/sbin`."
 
     validate do |value|
-      unless value =~ /^\s*(\w+)\s*=\s*(.*)\s*$/ or value == :absent or value == "absent"
-        raise ArgumentError, _("Invalid environment setting %{value}") % { value: value.inspect }
+      unless value =~ %r{^\s*(\w+)\s*=\s*(.*)\s*$} || value == :absent || value == 'absent'
+        raise ArgumentError, _('Invalid environment setting %{value}') % { value: value.inspect }
       end
     end
 
     def insync?(is)
       if is.is_a? Array
-        return is.sort == @should.sort
+        is.sort == @should.sort
       else
-        return is == @should
+        is == @should
       end
     end
 
-    def should
-      @should
-    end
+    attr_reader :should
 
     def should_to_s(newvalue = @should)
       if newvalue
-        newvalue.join(",")
+        newvalue.join(',')
       else
         nil
       end
@@ -373,12 +370,12 @@ Puppet::Type.newtype(:cron) do
       The default crontab provider executes the system `crontab` using
       the user account specified by this property."
 
-    defaultto {
-      if not provider.is_a?(@resource.class.provider(:crontab))
+    defaultto do
+      unless provider.is_a?(@resource.class.provider(:crontab))
         struct = Etc.getpwuid(Process.uid)
-        struct.respond_to?(:name) && struct.name or 'root'
+        struct.respond_to?(:name) && struct.name || 'root'
       end
-    }
+    end
   end
 
   # Autorequire the owner of the crontab entry.
@@ -397,20 +394,20 @@ Puppet::Type.newtype(:cron) do
       setting both `user` and `target` to different values will result in
       undefined behavior."
 
-    defaultto {
+    defaultto do
       if provider.is_a?(@resource.class.provider(:crontab))
         if val = @resource.should(:user)
           val
         else
           struct = Etc.getpwuid(Process.uid)
-          struct.respond_to?(:name) && struct.name or 'root'
+          struct.respond_to?(:name) && struct.name || 'root'
         end
       elsif provider.class.ancestors.include?(Puppet::Provider::ParsedFile)
         provider.class.default_target
       else
         nil
       end
-    }
+    end
   end
 
   validate do
@@ -418,10 +415,10 @@ Puppet::Type.newtype(:cron) do
     return true if self[:special] == :absent
     # there is a special schedule in @should, so we don't want to see
     # any numeric should values
-    [ :minute, :hour, :weekday, :monthday, :month ].each do |field|
+    [:minute, :hour, :weekday, :monthday, :month].each do |field|
       next unless self[field]
       next if self[field] == :absent
-      raise ArgumentError, _("%{cron} cannot specify both a special schedule and a value for %{field}") % { cron: self.ref, field: field }
+      raise ArgumentError, _('%{cron} cannot specify both a special schedule and a value for %{field}') % { cron: ref, field: field }
     end
   end
 
@@ -451,7 +448,7 @@ Puppet::Type.newtype(:cron) do
   end
 
   def value(name)
-    name = name.intern
+    name = name.to_sym
     ret = nil
     if obj = @parameters[name]
       ret = obj.should
@@ -469,12 +466,11 @@ Puppet::Type.newtype(:cron) do
       when :special
         # nothing
       else
-        #ret = (self.class.validproperty?(name).default || "*").to_s
-        ret = "*"
+        # ret = (self.class.validproperty?(name).default || "*").to_s
+        ret = '*'
       end
     end
 
     ret
   end
 end
-

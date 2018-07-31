@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Puppet::Type.type(:cron), :unless => Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
   let(:simple_provider) do
     @provider_class = described_class.provide(:simple) { mk_resource_methods }
     @provider_class.stubs(:suitable?).returns true
@@ -17,11 +17,11 @@ describe Puppet::Type.type(:cron), :unless => Puppet.features.microsoft_windows?
     described_class.unprovide(:simple)
   end
 
-  it "should have :name be its namevar" do
+  it 'has :name be its namevar' do
     expect(described_class.key_attributes).to eq([:name])
   end
 
-  describe "when validating attributes" do
+  describe 'when validating attributes' do
     [:name, :provider].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
@@ -41,487 +41,481 @@ describe Puppet::Type.type(:cron), :unless => Puppet.features.microsoft_windows?
     end
   end
 
-
-  describe "when validating values" do
-
-    describe "ensure" do
-      it "should support present as a value for ensure" do
-        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
+  describe 'when validating values' do
+    describe 'ensure' do
+      it 'supports present as a value for ensure' do
+        expect { described_class.new(name: 'foo', ensure: :present) }.not_to raise_error
       end
 
-      it "should support absent as a value for ensure" do
-        expect { described_class.new(:name => 'foo', :ensure => :present) }.to_not raise_error
+      it 'supports absent as a value for ensure' do
+        expect { described_class.new(name: 'foo', ensure: :present) }.not_to raise_error
       end
 
-      it "should not support other values" do
-        expect { described_class.new(:name => 'foo', :ensure => :foo) }.to raise_error(Puppet::Error, /Invalid value/)
+      it 'does not support other values' do
+        expect { described_class.new(name: 'foo', ensure: :foo) }.to raise_error(Puppet::Error, %r{Invalid value})
       end
     end
 
-    describe "command" do
-      it "should discard leading spaces" do
-        expect(described_class.new(:name => 'foo', :command => " /bin/true")[:command]).not_to match Regexp.new(" ")
+    describe 'command' do
+      it 'discards leading spaces' do
+        expect(described_class.new(name: 'foo', command: ' /bin/true')[:command]).not_to match Regexp.new(' ')
       end
-      it "should discard trailing spaces" do
-        expect(described_class.new(:name => 'foo', :command => "/bin/true ")[:command]).not_to match Regexp.new(" ")
+      it 'discards trailing spaces' do
+        expect(described_class.new(name: 'foo', command: '/bin/true ')[:command]).not_to match Regexp.new(' ')
       end
     end
 
-    describe "minute" do
-      it "should support absent" do
-        expect { described_class.new(:name => 'foo', :minute => 'absent') }.to_not raise_error
+    describe 'minute' do
+      it 'supports absent' do
+        expect { described_class.new(name: 'foo', minute: 'absent') }.not_to raise_error
       end
 
-      it "should support *" do
-        expect { described_class.new(:name => 'foo', :minute => '*') }.to_not raise_error
+      it 'supports *' do
+        expect { described_class.new(name: 'foo', minute: '*') }.not_to raise_error
       end
 
-      it "should translate absent to :absent" do
-        expect(described_class.new(:name => 'foo', :minute => 'absent')[:minute]).to eq(:absent)
+      it 'translates absent to :absent' do
+        expect(described_class.new(name: 'foo', minute: 'absent')[:minute]).to eq(:absent)
       end
 
-      it "should translate * to :absent" do
-        expect(described_class.new(:name => 'foo', :minute => '*')[:minute]).to eq(:absent)
+      it 'translates * to :absent' do
+        expect(described_class.new(name: 'foo', minute: '*')[:minute]).to eq(:absent)
       end
 
-      it "should support valid single values" do
-        expect { described_class.new(:name => 'foo', :minute => '0') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :minute => '1') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :minute => '59') }.to_not raise_error
+      it 'supports valid single values' do
+        expect { described_class.new(name: 'foo', minute: '0') }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: '1') }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: '59') }.not_to raise_error
       end
 
-      it "should not support non numeric characters" do
-        expect { described_class.new(:name => 'foo', :minute => 'z59') }.to raise_error(Puppet::Error, /z59 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => '5z9') }.to raise_error(Puppet::Error, /5z9 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => '59z') }.to raise_error(Puppet::Error, /59z is not a valid minute/)
+      it 'does not support non numeric characters' do
+        expect { described_class.new(name: 'foo', minute: 'z59') }.to raise_error(Puppet::Error, %r{z59 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: '5z9') }.to raise_error(Puppet::Error, %r{5z9 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: '59z') }.to raise_error(Puppet::Error, %r{59z is not a valid minute})
       end
 
-      it "should not support single values out of range" do
-
-        expect { described_class.new(:name => 'foo', :minute => '-1') }.to raise_error(Puppet::Error, /-1 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => '60') }.to raise_error(Puppet::Error, /60 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => '61') }.to raise_error(Puppet::Error, /61 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => '120') }.to raise_error(Puppet::Error, /120 is not a valid minute/)
+      it 'does not support single values out of range' do
+        expect { described_class.new(name: 'foo', minute: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: '60') }.to raise_error(Puppet::Error, %r{60 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: '61') }.to raise_error(Puppet::Error, %r{61 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: '120') }.to raise_error(Puppet::Error, %r{120 is not a valid minute})
       end
 
-      it "should support valid multiple values" do
-        expect { described_class.new(:name => 'foo', :minute => ['0','1','59'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :minute => ['40','30','20'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :minute => ['10','30','20'] ) }.to_not raise_error
+      it 'supports valid multiple values' do
+        expect { described_class.new(name: 'foo', minute: ['0', '1', '59']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: ['40', '30', '20']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: ['10', '30', '20']) }.not_to raise_error
       end
 
-      it "should not support multiple values if at least one is invalid" do
+      it 'does not support multiple values if at least one is invalid' do
         # one invalid
-        expect { described_class.new(:name => 'foo', :minute => ['0','1','60'] ) }.to raise_error(Puppet::Error, /60 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => ['0','120','59'] ) }.to raise_error(Puppet::Error, /120 is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => ['-1','1','59'] ) }.to raise_error(Puppet::Error, /-1 is not a valid minute/)
+        expect { described_class.new(name: 'foo', minute: ['0', '1', '60']) }.to raise_error(Puppet::Error, %r{60 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: ['0', '120', '59']) }.to raise_error(Puppet::Error, %r{120 is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: ['-1', '1', '59']) }.to raise_error(Puppet::Error, %r{-1 is not a valid minute})
         # two invalid
-        expect { described_class.new(:name => 'foo', :minute => ['0','61','62'] ) }.to raise_error(Puppet::Error, /(61|62) is not a valid minute/)
+        expect { described_class.new(name: 'foo', minute: ['0', '61', '62']) }.to raise_error(Puppet::Error, %r{(61|62) is not a valid minute})
         # all invalid
-        expect { described_class.new(:name => 'foo', :minute => ['-1','61','62'] ) }.to raise_error(Puppet::Error, /(-1|61|62) is not a valid minute/)
+        expect { described_class.new(name: 'foo', minute: ['-1', '61', '62']) }.to raise_error(Puppet::Error, %r{(-1|61|62) is not a valid minute})
       end
 
-      it "should support valid step syntax" do
-        expect { described_class.new(:name => 'foo', :minute => '*/2' ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :minute => '10-16/2' ) }.to_not raise_error
+      it 'supports valid step syntax' do
+        expect { described_class.new(name: 'foo', minute: '*/2') }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: '10-16/2') }.not_to raise_error
       end
 
-      it "should not support invalid steps" do
-        expect { described_class.new(:name => 'foo', :minute => '*/A' ) }.to raise_error(Puppet::Error, /\*\/A is not a valid minute/)
-        expect { described_class.new(:name => 'foo', :minute => '*/2A' ) }.to raise_error(Puppet::Error, /\*\/2A is not a valid minute/)
+      it 'does not support invalid steps' do
+        expect { described_class.new(name: 'foo', minute: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid minute/)
+        expect { described_class.new(name: 'foo', minute: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid minute/)
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :minute => '*/120' ) }.to raise_error(Puppet::Error, /is not a valid minute/)
       end
     end
 
-    describe "hour" do
-      it "should support absent" do
-        expect { described_class.new(:name => 'foo', :hour => 'absent') }.to_not raise_error
+    describe 'hour' do
+      it 'supports absent' do
+        expect { described_class.new(name: 'foo', hour: 'absent') }.not_to raise_error
       end
 
-      it "should support *" do
-        expect { described_class.new(:name => 'foo', :hour => '*') }.to_not raise_error
+      it 'supports *' do
+        expect { described_class.new(name: 'foo', hour: '*') }.not_to raise_error
       end
 
-      it "should translate absent to :absent" do
-        expect(described_class.new(:name => 'foo', :hour => 'absent')[:hour]).to eq(:absent)
+      it 'translates absent to :absent' do
+        expect(described_class.new(name: 'foo', hour: 'absent')[:hour]).to eq(:absent)
       end
 
-      it "should translate * to :absent" do
-        expect(described_class.new(:name => 'foo', :hour => '*')[:hour]).to eq(:absent)
+      it 'translates * to :absent' do
+        expect(described_class.new(name: 'foo', hour: '*')[:hour]).to eq(:absent)
       end
 
-      it "should support valid single values" do
-        expect { described_class.new(:name => 'foo', :hour => '0') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => '11') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => '12') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => '13') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => '23') }.to_not raise_error
+      it 'supports valid single values' do
+        expect { described_class.new(name: 'foo', hour: '0') }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: '11') }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: '12') }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: '13') }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: '23') }.not_to raise_error
       end
 
-      it "should not support non numeric characters" do
-        expect { described_class.new(:name => 'foo', :hour => 'z15') }.to raise_error(Puppet::Error, /z15 is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => '1z5') }.to raise_error(Puppet::Error, /1z5 is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => '15z') }.to raise_error(Puppet::Error, /15z is not a valid hour/)
+      it 'does not support non numeric characters' do
+        expect { described_class.new(name: 'foo', hour: 'z15') }.to raise_error(Puppet::Error, %r{z15 is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: '1z5') }.to raise_error(Puppet::Error, %r{1z5 is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: '15z') }.to raise_error(Puppet::Error, %r{15z is not a valid hour})
       end
 
-      it "should not support single values out of range" do
-        expect { described_class.new(:name => 'foo', :hour => '-1') }.to raise_error(Puppet::Error, /-1 is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => '24') }.to raise_error(Puppet::Error, /24 is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => '120') }.to raise_error(Puppet::Error, /120 is not a valid hour/)
+      it 'does not support single values out of range' do
+        expect { described_class.new(name: 'foo', hour: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: '24') }.to raise_error(Puppet::Error, %r{24 is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: '120') }.to raise_error(Puppet::Error, %r{120 is not a valid hour})
       end
 
-      it "should support valid multiple values" do
-        expect { described_class.new(:name => 'foo', :hour => ['0','1','23'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => ['5','16','14'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => ['16','13','9'] ) }.to_not raise_error
+      it 'supports valid multiple values' do
+        expect { described_class.new(name: 'foo', hour: ['0', '1', '23']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: ['5', '16', '14']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: ['16', '13', '9']) }.not_to raise_error
       end
 
-      it "should not support multiple values if at least one is invalid" do
+      it 'does not support multiple values if at least one is invalid' do
         # one invalid
-        expect { described_class.new(:name => 'foo', :hour => ['0','1','24'] ) }.to raise_error(Puppet::Error, /24 is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => ['0','-1','5'] ) }.to raise_error(Puppet::Error, /-1 is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => ['-1','1','23'] ) }.to raise_error(Puppet::Error, /-1 is not a valid hour/)
+        expect { described_class.new(name: 'foo', hour: ['0', '1', '24']) }.to raise_error(Puppet::Error, %r{24 is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: ['0', '-1', '5']) }.to raise_error(Puppet::Error, %r{-1 is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: ['-1', '1', '23']) }.to raise_error(Puppet::Error, %r{-1 is not a valid hour})
         # two invalid
-        expect { described_class.new(:name => 'foo', :hour => ['0','25','26'] ) }.to raise_error(Puppet::Error, /(25|26) is not a valid hour/)
+        expect { described_class.new(name: 'foo', hour: ['0', '25', '26']) }.to raise_error(Puppet::Error, %r{(25|26) is not a valid hour})
         # all invalid
-        expect { described_class.new(:name => 'foo', :hour => ['-1','24','120'] ) }.to raise_error(Puppet::Error, /(-1|24|120) is not a valid hour/)
+        expect { described_class.new(name: 'foo', hour: ['-1', '24', '120']) }.to raise_error(Puppet::Error, %r{(-1|24|120) is not a valid hour})
       end
 
-      it "should support valid step syntax" do
-        expect { described_class.new(:name => 'foo', :hour => '*/2' ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :hour => '10-18/4' ) }.to_not raise_error
+      it 'supports valid step syntax' do
+        expect { described_class.new(name: 'foo', hour: '*/2') }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: '10-18/4') }.not_to raise_error
       end
 
-      it "should not support invalid steps" do
-        expect { described_class.new(:name => 'foo', :hour => '*/A' ) }.to raise_error(Puppet::Error, /\*\/A is not a valid hour/)
-        expect { described_class.new(:name => 'foo', :hour => '*/2A' ) }.to raise_error(Puppet::Error, /\*\/2A is not a valid hour/)
+      it 'does not support invalid steps' do
+        expect { described_class.new(name: 'foo', hour: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid hour/)
+        expect { described_class.new(name: 'foo', hour: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid hour/)
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :hour => '*/26' ) }.to raise_error(Puppet::Error, /is not a valid hour/)
       end
     end
 
-    describe "weekday" do
-      it "should support absent" do
-        expect { described_class.new(:name => 'foo', :weekday => 'absent') }.to_not raise_error
+    describe 'weekday' do
+      it 'supports absent' do
+        expect { described_class.new(name: 'foo', weekday: 'absent') }.not_to raise_error
       end
 
-      it "should support *" do
-        expect { described_class.new(:name => 'foo', :weekday => '*') }.to_not raise_error
+      it 'supports *' do
+        expect { described_class.new(name: 'foo', weekday: '*') }.not_to raise_error
       end
 
-      it "should translate absent to :absent" do
-        expect(described_class.new(:name => 'foo', :weekday => 'absent')[:weekday]).to eq(:absent)
+      it 'translates absent to :absent' do
+        expect(described_class.new(name: 'foo', weekday: 'absent')[:weekday]).to eq(:absent)
       end
 
-      it "should translate * to :absent" do
-        expect(described_class.new(:name => 'foo', :weekday => '*')[:weekday]).to eq(:absent)
+      it 'translates * to :absent' do
+        expect(described_class.new(name: 'foo', weekday: '*')[:weekday]).to eq(:absent)
       end
 
-      it "should support valid numeric weekdays" do
-        expect { described_class.new(:name => 'foo', :weekday => '0') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => '1') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => '6') }.to_not raise_error
+      it 'supports valid numeric weekdays' do
+        expect { described_class.new(name: 'foo', weekday: '0') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: '1') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: '6') }.not_to raise_error
         # According to http://www.manpagez.com/man/5/crontab 7 is also valid (Sunday)
-        expect { described_class.new(:name => 'foo', :weekday => '7') }.to_not raise_error
+        expect { described_class.new(name: 'foo', weekday: '7') }.not_to raise_error
       end
 
-      it "should support valid weekdays as words (long version)" do
-        expect { described_class.new(:name => 'foo', :weekday => 'Monday') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Tuesday') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Wednesday') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Thursday') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Friday') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Saturday') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Sunday') }.to_not raise_error
+      it 'supports valid weekdays as words (long version)' do
+        expect { described_class.new(name: 'foo', weekday: 'Monday') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Tuesday') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Wednesday') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Thursday') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Friday') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Saturday') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Sunday') }.not_to raise_error
       end
 
-      it "should support valid weekdays as words (3 character version)" do
-        expect { described_class.new(:name => 'foo', :weekday => 'Mon') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Tue') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Wed') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Thu') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Fri') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Sat') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => 'Sun') }.to_not raise_error
+      it 'supports valid weekdays as words (3 character version)' do
+        expect { described_class.new(name: 'foo', weekday: 'Mon') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Tue') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Wed') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Thu') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Fri') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Sat') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: 'Sun') }.not_to raise_error
       end
 
-      it "should not support numeric values out of range" do
-        expect { described_class.new(:name => 'foo', :weekday => '-1') }.to raise_error(Puppet::Error, /-1 is not a valid weekday/)
-        expect { described_class.new(:name => 'foo', :weekday => '8') }.to raise_error(Puppet::Error, /8 is not a valid weekday/)
+      it 'does not support numeric values out of range' do
+        expect { described_class.new(name: 'foo', weekday: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid weekday})
+        expect { described_class.new(name: 'foo', weekday: '8') }.to raise_error(Puppet::Error, %r{8 is not a valid weekday})
       end
 
-      it "should not support invalid weekday names" do
-        expect { described_class.new(:name => 'foo', :weekday => 'Sar') }.to raise_error(Puppet::Error, /Sar is not a valid weekday/)
+      it 'does not support invalid weekday names' do
+        expect { described_class.new(name: 'foo', weekday: 'Sar') }.to raise_error(Puppet::Error, %r{Sar is not a valid weekday})
       end
 
-      it "should support valid multiple values" do
-        expect { described_class.new(:name => 'foo', :weekday => ['0','1','6'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => ['Mon','Wed','Friday'] ) }.to_not raise_error
+      it 'supports valid multiple values' do
+        expect { described_class.new(name: 'foo', weekday: ['0', '1', '6']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: ['Mon', 'Wed', 'Friday']) }.not_to raise_error
       end
 
-      it "should not support multiple values if at least one is invalid" do
+      it 'does not support multiple values if at least one is invalid' do
         # one invalid
-        expect { described_class.new(:name => 'foo', :weekday => ['0','1','8'] ) }.to raise_error(Puppet::Error, /8 is not a valid weekday/)
-        expect { described_class.new(:name => 'foo', :weekday => ['Mon','Fii','Sat'] ) }.to raise_error(Puppet::Error, /Fii is not a valid weekday/)
+        expect { described_class.new(name: 'foo', weekday: ['0', '1', '8']) }.to raise_error(Puppet::Error, %r{8 is not a valid weekday})
+        expect { described_class.new(name: 'foo', weekday: ['Mon', 'Fii', 'Sat']) }.to raise_error(Puppet::Error, %r{Fii is not a valid weekday})
         # two invalid
-        expect { described_class.new(:name => 'foo', :weekday => ['Mos','Fii','Sat'] ) }.to raise_error(Puppet::Error, /(Mos|Fii) is not a valid weekday/)
+        expect { described_class.new(name: 'foo', weekday: ['Mos', 'Fii', 'Sat']) }.to raise_error(Puppet::Error, %r{(Mos|Fii) is not a valid weekday})
         # all invalid
-        expect { described_class.new(:name => 'foo', :weekday => ['Mos','Fii','Saa'] ) }.to raise_error(Puppet::Error, /(Mos|Fii|Saa) is not a valid weekday/)
-        expect { described_class.new(:name => 'foo', :weekday => ['-1','8','11'] ) }.to raise_error(Puppet::Error, /(-1|8|11) is not a valid weekday/)
+        expect { described_class.new(name: 'foo', weekday: ['Mos', 'Fii', 'Saa']) }.to raise_error(Puppet::Error, %r{(Mos|Fii|Saa) is not a valid weekday})
+        expect { described_class.new(name: 'foo', weekday: ['-1', '8', '11']) }.to raise_error(Puppet::Error, %r{(-1|8|11) is not a valid weekday})
       end
 
-      it "should support valid step syntax" do
-        expect { described_class.new(:name => 'foo', :weekday => '*/2' ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :weekday => '0-4/2' ) }.to_not raise_error
+      it 'supports valid step syntax' do
+        expect { described_class.new(name: 'foo', weekday: '*/2') }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: '0-4/2') }.not_to raise_error
       end
 
-      it "should not support invalid steps" do
-        expect { described_class.new(:name => 'foo', :weekday => '*/A' ) }.to raise_error(Puppet::Error, /\*\/A is not a valid weekday/)
-        expect { described_class.new(:name => 'foo', :weekday => '*/2A' ) }.to raise_error(Puppet::Error, /\*\/2A is not a valid weekday/)
+      it 'does not support invalid steps' do
+        expect { described_class.new(name: 'foo', weekday: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid weekday/)
+        expect { described_class.new(name: 'foo', weekday: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid weekday/)
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :weekday => '*/9' ) }.to raise_error(Puppet::Error, /is not a valid weekday/)
       end
     end
 
-    describe "month" do
-      it "should support absent" do
-        expect { described_class.new(:name => 'foo', :month => 'absent') }.to_not raise_error
+    describe 'month' do
+      it 'supports absent' do
+        expect { described_class.new(name: 'foo', month: 'absent') }.not_to raise_error
       end
 
-      it "should support *" do
-        expect { described_class.new(:name => 'foo', :month => '*') }.to_not raise_error
+      it 'supports *' do
+        expect { described_class.new(name: 'foo', month: '*') }.not_to raise_error
       end
 
-      it "should translate absent to :absent" do
-        expect(described_class.new(:name => 'foo', :month => 'absent')[:month]).to eq(:absent)
+      it 'translates absent to :absent' do
+        expect(described_class.new(name: 'foo', month: 'absent')[:month]).to eq(:absent)
       end
 
-      it "should translate * to :absent" do
-        expect(described_class.new(:name => 'foo', :month => '*')[:month]).to eq(:absent)
+      it 'translates * to :absent' do
+        expect(described_class.new(name: 'foo', month: '*')[:month]).to eq(:absent)
       end
 
-      it "should support valid numeric values" do
-        expect { described_class.new(:name => 'foo', :month => '1') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :month => '12') }.to_not raise_error
+      it 'supports valid numeric values' do
+        expect { described_class.new(name: 'foo', month: '1') }.not_to raise_error
+        expect { described_class.new(name: 'foo', month: '12') }.not_to raise_error
       end
 
-      it "should support valid months as words" do
-        expect( described_class.new(:name => 'foo', :month => 'January')[:month]   ).to eq(['1'])
-        expect( described_class.new(:name => 'foo', :month => 'February')[:month]  ).to eq(['2'])
-        expect( described_class.new(:name => 'foo', :month => 'March')[:month]     ).to eq(['3'])
-        expect( described_class.new(:name => 'foo', :month => 'April')[:month]     ).to eq(['4'])
-        expect( described_class.new(:name => 'foo', :month => 'May')[:month]       ).to eq(['5'])
-        expect( described_class.new(:name => 'foo', :month => 'June')[:month]      ).to eq(['6'])
-        expect( described_class.new(:name => 'foo', :month => 'July')[:month]      ).to eq(['7'])
-        expect( described_class.new(:name => 'foo', :month => 'August')[:month]    ).to eq(['8'])
-        expect( described_class.new(:name => 'foo', :month => 'September')[:month] ).to eq(['9'])
-        expect( described_class.new(:name => 'foo', :month => 'October')[:month]   ).to eq(['10'])
-        expect( described_class.new(:name => 'foo', :month => 'November')[:month]  ).to eq(['11'])
-        expect( described_class.new(:name => 'foo', :month => 'December')[:month]  ).to eq(['12'])
+      it 'supports valid months as words' do
+        expect(described_class.new(name: 'foo', month: 'January')[:month]).to eq(['1'])
+        expect(described_class.new(name: 'foo', month: 'February')[:month]).to eq(['2'])
+        expect(described_class.new(name: 'foo', month: 'March')[:month]).to eq(['3'])
+        expect(described_class.new(name: 'foo', month: 'April')[:month]).to eq(['4'])
+        expect(described_class.new(name: 'foo', month: 'May')[:month]).to eq(['5'])
+        expect(described_class.new(name: 'foo', month: 'June')[:month]).to eq(['6'])
+        expect(described_class.new(name: 'foo', month: 'July')[:month]).to eq(['7'])
+        expect(described_class.new(name: 'foo', month: 'August')[:month]).to eq(['8'])
+        expect(described_class.new(name: 'foo', month: 'September')[:month]).to eq(['9'])
+        expect(described_class.new(name: 'foo', month: 'October')[:month]).to eq(['10'])
+        expect(described_class.new(name: 'foo', month: 'November')[:month]).to eq(['11'])
+        expect(described_class.new(name: 'foo', month: 'December')[:month]).to eq(['12'])
       end
 
-      it "should support valid months as words (3 character short version)" do
-        expect( described_class.new(:name => 'foo', :month => 'Jan')[:month] ).to eq(['1'])
-        expect( described_class.new(:name => 'foo', :month => 'Feb')[:month] ).to eq(['2'])
-        expect( described_class.new(:name => 'foo', :month => 'Mar')[:month] ).to eq(['3'])
-        expect( described_class.new(:name => 'foo', :month => 'Apr')[:month] ).to eq(['4'])
-        expect( described_class.new(:name => 'foo', :month => 'May')[:month] ).to eq(['5'])
-        expect( described_class.new(:name => 'foo', :month => 'Jun')[:month] ).to eq(['6'])
-        expect( described_class.new(:name => 'foo', :month => 'Jul')[:month] ).to eq(['7'])
-        expect( described_class.new(:name => 'foo', :month => 'Aug')[:month] ).to eq(['8'])
-        expect( described_class.new(:name => 'foo', :month => 'Sep')[:month] ).to eq(['9'])
-        expect( described_class.new(:name => 'foo', :month => 'Oct')[:month] ).to eq(['10'])
-        expect( described_class.new(:name => 'foo', :month => 'Nov')[:month] ).to eq(['11'])
-        expect( described_class.new(:name => 'foo', :month => 'Dec')[:month] ).to eq(['12'])
+      it 'supports valid months as words (3 character short version)' do
+        expect(described_class.new(name: 'foo', month: 'Jan')[:month]).to eq(['1'])
+        expect(described_class.new(name: 'foo', month: 'Feb')[:month]).to eq(['2'])
+        expect(described_class.new(name: 'foo', month: 'Mar')[:month]).to eq(['3'])
+        expect(described_class.new(name: 'foo', month: 'Apr')[:month]).to eq(['4'])
+        expect(described_class.new(name: 'foo', month: 'May')[:month]).to eq(['5'])
+        expect(described_class.new(name: 'foo', month: 'Jun')[:month]).to eq(['6'])
+        expect(described_class.new(name: 'foo', month: 'Jul')[:month]).to eq(['7'])
+        expect(described_class.new(name: 'foo', month: 'Aug')[:month]).to eq(['8'])
+        expect(described_class.new(name: 'foo', month: 'Sep')[:month]).to eq(['9'])
+        expect(described_class.new(name: 'foo', month: 'Oct')[:month]).to eq(['10'])
+        expect(described_class.new(name: 'foo', month: 'Nov')[:month]).to eq(['11'])
+        expect(described_class.new(name: 'foo', month: 'Dec')[:month]).to eq(['12'])
       end
 
-      it "should not support numeric values out of range" do
-        expect { described_class.new(:name => 'foo', :month => '-1') }.to raise_error(Puppet::Error, /-1 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => '0') }.to raise_error(Puppet::Error, /0 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => '13') }.to raise_error(Puppet::Error, /13 is not a valid month/)
+      it 'does not support numeric values out of range' do
+        expect { described_class.new(name: 'foo', month: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid month})
+        expect { described_class.new(name: 'foo', month: '0') }.to raise_error(Puppet::Error, %r{0 is not a valid month})
+        expect { described_class.new(name: 'foo', month: '13') }.to raise_error(Puppet::Error, %r{13 is not a valid month})
       end
 
-      it "should not support words that are not valid months" do
-        expect { described_class.new(:name => 'foo', :month => 'Jal') }.to raise_error(Puppet::Error, /Jal is not a valid month/)
+      it 'does not support words that are not valid months' do
+        expect { described_class.new(name: 'foo', month: 'Jal') }.to raise_error(Puppet::Error, %r{Jal is not a valid month})
       end
 
-      it "should not support single values out of range" do
-
-        expect { described_class.new(:name => 'foo', :month => '-1') }.to raise_error(Puppet::Error, /-1 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => '60') }.to raise_error(Puppet::Error, /60 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => '61') }.to raise_error(Puppet::Error, /61 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => '120') }.to raise_error(Puppet::Error, /120 is not a valid month/)
+      it 'does not support single values out of range' do
+        expect { described_class.new(name: 'foo', month: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid month})
+        expect { described_class.new(name: 'foo', month: '60') }.to raise_error(Puppet::Error, %r{60 is not a valid month})
+        expect { described_class.new(name: 'foo', month: '61') }.to raise_error(Puppet::Error, %r{61 is not a valid month})
+        expect { described_class.new(name: 'foo', month: '120') }.to raise_error(Puppet::Error, %r{120 is not a valid month})
       end
 
-      it "should support valid multiple values" do
-        expect { described_class.new(:name => 'foo', :month => ['1','9','12'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :month => ['Jan','March','Jul'] ) }.to_not raise_error
+      it 'supports valid multiple values' do
+        expect { described_class.new(name: 'foo', month: ['1', '9', '12']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', month: ['Jan', 'March', 'Jul']) }.not_to raise_error
       end
 
-      it "should not support multiple values if at least one is invalid" do
+      it 'does not support multiple values if at least one is invalid' do
         # one invalid
-        expect { described_class.new(:name => 'foo', :month => ['0','1','12'] ) }.to raise_error(Puppet::Error, /0 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => ['1','13','10'] ) }.to raise_error(Puppet::Error, /13 is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => ['Jan','Feb','Jxx'] ) }.to raise_error(Puppet::Error, /Jxx is not a valid month/)
+        expect { described_class.new(name: 'foo', month: ['0', '1', '12']) }.to raise_error(Puppet::Error, %r{0 is not a valid month})
+        expect { described_class.new(name: 'foo', month: ['1', '13', '10']) }.to raise_error(Puppet::Error, %r{13 is not a valid month})
+        expect { described_class.new(name: 'foo', month: ['Jan', 'Feb', 'Jxx']) }.to raise_error(Puppet::Error, %r{Jxx is not a valid month})
         # two invalid
-        expect { described_class.new(:name => 'foo', :month => ['Jan','Fex','Jux'] ) }.to raise_error(Puppet::Error, /(Fex|Jux) is not a valid month/)
+        expect { described_class.new(name: 'foo', month: ['Jan', 'Fex', 'Jux']) }.to raise_error(Puppet::Error, %r{(Fex|Jux) is not a valid month})
         # all invalid
-        expect { described_class.new(:name => 'foo', :month => ['-1','0','13'] ) }.to raise_error(Puppet::Error, /(-1|0|13) is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => ['Jax','Fex','Aux'] ) }.to raise_error(Puppet::Error, /(Jax|Fex|Aux) is not a valid month/)
+        expect { described_class.new(name: 'foo', month: ['-1', '0', '13']) }.to raise_error(Puppet::Error, %r{(-1|0|13) is not a valid month})
+        expect { described_class.new(name: 'foo', month: ['Jax', 'Fex', 'Aux']) }.to raise_error(Puppet::Error, %r{(Jax|Fex|Aux) is not a valid month})
       end
 
-      it "should support valid step syntax" do
-        expect { described_class.new(:name => 'foo', :month => '*/2' ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :month => '1-12/3' ) }.to_not raise_error
+      it 'supports valid step syntax' do
+        expect { described_class.new(name: 'foo', month: '*/2') }.not_to raise_error
+        expect { described_class.new(name: 'foo', month: '1-12/3') }.not_to raise_error
       end
 
-      it "should not support invalid steps" do
-        expect { described_class.new(:name => 'foo', :month => '*/A' ) }.to raise_error(Puppet::Error, /\*\/A is not a valid month/)
-        expect { described_class.new(:name => 'foo', :month => '*/2A' ) }.to raise_error(Puppet::Error, /\*\/2A is not a valid month/)
+      it 'does not support invalid steps' do
+        expect { described_class.new(name: 'foo', month: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid month/)
+        expect { described_class.new(name: 'foo', month: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid month/)
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :month => '*/13' ) }.to raise_error(Puppet::Error, /is not a valid month/)
       end
     end
 
-    describe "monthday" do
-      it "should support absent" do
-        expect { described_class.new(:name => 'foo', :monthday => 'absent') }.to_not raise_error
+    describe 'monthday' do
+      it 'supports absent' do
+        expect { described_class.new(name: 'foo', monthday: 'absent') }.not_to raise_error
       end
 
-      it "should support *" do
-        expect { described_class.new(:name => 'foo', :monthday => '*') }.to_not raise_error
+      it 'supports *' do
+        expect { described_class.new(name: 'foo', monthday: '*') }.not_to raise_error
       end
 
-      it "should translate absent to :absent" do
-        expect(described_class.new(:name => 'foo', :monthday => 'absent')[:monthday]).to eq(:absent)
+      it 'translates absent to :absent' do
+        expect(described_class.new(name: 'foo', monthday: 'absent')[:monthday]).to eq(:absent)
       end
 
-      it "should translate * to :absent" do
-        expect(described_class.new(:name => 'foo', :monthday => '*')[:monthday]).to eq(:absent)
+      it 'translates * to :absent' do
+        expect(described_class.new(name: 'foo', monthday: '*')[:monthday]).to eq(:absent)
       end
 
-      it "should support valid single values" do
-        expect { described_class.new(:name => 'foo', :monthday => '1') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :monthday => '30') }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :monthday => '31') }.to_not raise_error
+      it 'supports valid single values' do
+        expect { described_class.new(name: 'foo', monthday: '1') }.not_to raise_error
+        expect { described_class.new(name: 'foo', monthday: '30') }.not_to raise_error
+        expect { described_class.new(name: 'foo', monthday: '31') }.not_to raise_error
       end
 
-      it "should not support non numeric characters" do
-        expect { described_class.new(:name => 'foo', :monthday => 'z23') }.to raise_error(Puppet::Error, /z23 is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => '2z3') }.to raise_error(Puppet::Error, /2z3 is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => '23z') }.to raise_error(Puppet::Error, /23z is not a valid monthday/)
+      it 'does not support non numeric characters' do
+        expect { described_class.new(name: 'foo', monthday: 'z23') }.to raise_error(Puppet::Error, %r{z23 is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: '2z3') }.to raise_error(Puppet::Error, %r{2z3 is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: '23z') }.to raise_error(Puppet::Error, %r{23z is not a valid monthday})
       end
 
-      it "should not support single values out of range" do
-        expect { described_class.new(:name => 'foo', :monthday => '-1') }.to raise_error(Puppet::Error, /-1 is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => '0') }.to raise_error(Puppet::Error, /0 is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => '32') }.to raise_error(Puppet::Error, /32 is not a valid monthday/)
+      it 'does not support single values out of range' do
+        expect { described_class.new(name: 'foo', monthday: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: '0') }.to raise_error(Puppet::Error, %r{0 is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: '32') }.to raise_error(Puppet::Error, %r{32 is not a valid monthday})
       end
 
-      it "should support valid multiple values" do
-        expect { described_class.new(:name => 'foo', :monthday => ['1','23','31'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :monthday => ['31','23','1'] ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :monthday => ['1','31','23'] ) }.to_not raise_error
+      it 'supports valid multiple values' do
+        expect { described_class.new(name: 'foo', monthday: ['1', '23', '31']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', monthday: ['31', '23', '1']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', monthday: ['1', '31', '23']) }.not_to raise_error
       end
 
-      it "should not support multiple values if at least one is invalid" do
+      it 'does not support multiple values if at least one is invalid' do
         # one invalid
-        expect { described_class.new(:name => 'foo', :monthday => ['1','23','32'] ) }.to raise_error(Puppet::Error, /32 is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => ['-1','12','23'] ) }.to raise_error(Puppet::Error, /-1 is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => ['13','32','30'] ) }.to raise_error(Puppet::Error, /32 is not a valid monthday/)
+        expect { described_class.new(name: 'foo', monthday: ['1', '23', '32']) }.to raise_error(Puppet::Error, %r{32 is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: ['-1', '12', '23']) }.to raise_error(Puppet::Error, %r{-1 is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: ['13', '32', '30']) }.to raise_error(Puppet::Error, %r{32 is not a valid monthday})
         # two invalid
-        expect { described_class.new(:name => 'foo', :monthday => ['-1','0','23'] ) }.to raise_error(Puppet::Error, /(-1|0) is not a valid monthday/)
+        expect { described_class.new(name: 'foo', monthday: ['-1', '0', '23']) }.to raise_error(Puppet::Error, %r{(-1|0) is not a valid monthday})
         # all invalid
-        expect { described_class.new(:name => 'foo', :monthday => ['-1','0','32'] ) }.to raise_error(Puppet::Error, /(-1|0|32) is not a valid monthday/)
+        expect { described_class.new(name: 'foo', monthday: ['-1', '0', '32']) }.to raise_error(Puppet::Error, %r{(-1|0|32) is not a valid monthday})
       end
 
-      it "should support valid step syntax" do
-        expect { described_class.new(:name => 'foo', :monthday => '*/2' ) }.to_not raise_error
-        expect { described_class.new(:name => 'foo', :monthday => '10-16/2' ) }.to_not raise_error
+      it 'supports valid step syntax' do
+        expect { described_class.new(name: 'foo', monthday: '*/2') }.not_to raise_error
+        expect { described_class.new(name: 'foo', monthday: '10-16/2') }.not_to raise_error
       end
 
-      it "should not support invalid steps" do
-        expect { described_class.new(:name => 'foo', :monthday => '*/A' ) }.to raise_error(Puppet::Error, /\*\/A is not a valid monthday/)
-        expect { described_class.new(:name => 'foo', :monthday => '*/2A' ) }.to raise_error(Puppet::Error, /\*\/2A is not a valid monthday/)
+      it 'does not support invalid steps' do
+        expect { described_class.new(name: 'foo', monthday: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid monthday/)
+        expect { described_class.new(name: 'foo', monthday: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid monthday/)
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :monthday => '*/32' ) }.to raise_error(Puppet::Error, /is not a valid monthday/)
       end
     end
 
-    describe "special" do
-      %w(reboot yearly annually monthly weekly daily midnight hourly).each do |value|
+    describe 'special' do
+      ['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'].each do |value|
         it "should support the value '#{value}'" do
-          expect { described_class.new(:name => 'foo', :special => value ) }.to_not raise_error
+          expect { described_class.new(name: 'foo', special: value) }.not_to raise_error
         end
       end
 
-      context "when combined with numeric schedule fields" do
+      context 'when combined with numeric schedule fields' do
         context "which are 'absent'" do
-          [ %w(reboot yearly annually monthly weekly daily midnight hourly), :absent ].flatten.each { |value|
+          [['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'], :absent].flatten.each do |value|
             it "should accept the value '#{value}' for special" do
               expect {
-                described_class.new(:name => 'foo', :minute => :absent, :special => value )
-              }.to_not raise_error
+                described_class.new(name: 'foo', minute: :absent, special: value)
+              }.not_to raise_error
             end
-          }
+          end
         end
-        context "which are not absent" do
-          %w(reboot yearly annually monthly weekly daily midnight hourly).each { |value|
+        context 'which are not absent' do
+          ['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'].each do |value|
             it "should not accept the value '#{value}' for special" do
               expect {
-                described_class.new(:name => 'foo', :minute => "1", :special => value )
-              }.to raise_error(Puppet::Error, /cannot specify both a special schedule and a value/)
+                described_class.new(name: 'foo', minute: '1', special: value)
+              }.to raise_error(Puppet::Error, %r{cannot specify both a special schedule and a value})
             end
-          }
-          it "should accept the 'absent' value for special" do
+          end
+          it "accepts the 'absent' value for special" do
             expect {
-              described_class.new(:name => 'foo', :minute => "1", :special => :absent )
-            }.to_not raise_error
+              described_class.new(name: 'foo', minute: '1', special: :absent)
+            }.not_to raise_error
           end
         end
       end
     end
 
-    describe "environment" do
-      it "it should accept an :environment that looks like a path" do
-        expect do
-          described_class.new(:name => 'foo',:environment => 'PATH=/bin:/usr/bin:/usr/sbin')
-        end.to_not raise_error
+    describe 'environment' do
+      it 'accepts an :environment that looks like a path' do
+        expect {
+          described_class.new(name: 'foo', environment: 'PATH=/bin:/usr/bin:/usr/sbin')
+        }.not_to raise_error
       end
 
-      it "should not accept environment variables that do not contain '='" do
-        expect do
-          described_class.new(:name => 'foo',:environment => 'INVALID')
-        end.to raise_error(Puppet::Error, /Invalid environment setting "INVALID"/)
+      it "does not accept environment variables that do not contain '='" do
+        expect {
+          described_class.new(name: 'foo', environment: 'INVALID')
+        }.to raise_error(Puppet::Error, %r{Invalid environment setting "INVALID"})
       end
 
-      it "should accept empty environment variables that do not contain '='" do
-        expect do
-          described_class.new(:name => 'foo',:environment => 'MAILTO=')
-        end.to_not raise_error
+      it "accepts empty environment variables that do not contain '='" do
+        expect {
+          described_class.new(name: 'foo', environment: 'MAILTO=')
+        }.not_to raise_error
       end
 
-      it "should accept 'absent'" do
-        expect do
-          described_class.new(:name => 'foo',:environment => 'absent')
-        end.to_not raise_error
+      it "accepts 'absent'" do
+        expect {
+          described_class.new(name: 'foo', environment: 'absent')
+        }.not_to raise_error
       end
-
     end
   end
 
-  describe "when autorequiring resources" do
-
+  describe 'when autorequiring resources' do
     before :each do
-      @user_bob = Puppet::Type.type(:user).new(:name => 'bob', :ensure => :present)
-      @user_alice = Puppet::Type.type(:user).new(:name => 'alice', :ensure => :present)
+      @user_bob = Puppet::Type.type(:user).new(name: 'bob', ensure: :present)
+      @user_alice = Puppet::Type.type(:user).new(name: 'alice', ensure: :present)
       @catalog = Puppet::Resource::Catalog.new
       @catalog.add_resource @user_bob, @user_alice
     end
 
-    it "should autorequire the user" do
-      @resource = described_class.new(:name => 'dummy', :command => '/usr/bin/uptime', :user => 'alice')
+    it 'autorequires the user' do
+      @resource = described_class.new(name: 'dummy', command: '/usr/bin/uptime', user: 'alice')
       @catalog.add_resource @resource
       req = @resource.autorequire
       expect(req.size).to eq(1)
@@ -530,14 +524,14 @@ describe Puppet::Type.type(:cron), :unless => Puppet.features.microsoft_windows?
     end
   end
 
-  it "should not require a command when removing an entry" do
-    entry = described_class.new(:name => "test_entry", :ensure => :absent)
+  it 'does not require a command when removing an entry' do
+    entry = described_class.new(name: 'test_entry', ensure: :absent)
     expect(entry.value(:command)).to eq(nil)
   end
 
-  it "should default to user => root if Etc.getpwuid(Process.uid) returns nil (#12357)" do
+  it 'defaults to user => root if Etc.getpwuid(Process.uid) returns nil (#12357)' do
     Etc.expects(:getpwuid).returns(nil)
-    entry = described_class.new(:name => "test_entry", :ensure => :present)
-    expect(entry.value(:user)).to eql "root"
+    entry = described_class.new(name: 'test_entry', ensure: :present)
+    expect(entry.value(:user)).to eql 'root'
   end
 end

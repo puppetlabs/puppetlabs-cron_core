@@ -1,99 +1,99 @@
 require 'puppet/provider/parsedfile'
 
-Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFile, :default_target => ENV["USER"] || "root") do
-  commands :crontab => "crontab"
+Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile, default_target: ENV['USER'] || 'root') do
+  commands crontab: 'crontab'
 
-  text_line :comment, :match => %r{^\s*#}, :post_parse => proc { |record|
-    record[:name] = $1 if record[:line] =~ /Puppet Name: (.+)\s*$/
+  text_line :comment, match: %r{^\s*#}, post_parse: proc { |record|
+    record[:name] = Regexp.last_match(1) if record[:line] =~ %r{Puppet Name: (.+)\s*$}
   }
 
-  text_line :blank, :match => %r{^\s*$}
+  text_line :blank, match: %r{^\s*$}
 
-  text_line :environment, :match => %r{^\s*\w+\s*=}
+  text_line :environment, match: %r{^\s*\w+\s*=}
 
   def self.filetype
-  tabname = case Facter.value(:osfamily)
-            when "Solaris"
-              :suntab
-            when "AIX"
-              :aixtab
-            else
-              :crontab
-            end
+    tabname = case Facter.value(:osfamily)
+              when 'Solaris'
+                :suntab
+              when 'AIX'
+                :aixtab
+              else
+                :crontab
+              end
 
     Puppet::Util::FileType.filetype(tabname)
   end
 
-  self::TIME_FIELDS = [:minute, :hour, :monthday, :month, :weekday]
+  self::TIME_FIELDS = [:minute, :hour, :monthday, :month, :weekday].freeze
 
   record_line :crontab,
-    :fields     => %w{time command},
-    :match      => %r{^\s*(@\w+|\S+\s+\S+\s+\S+\s+\S+\s+\S+)\s+(.+)$},
-    :absent     => '*',
-    :block_eval => :instance do
+              fields: ['time', 'command'],
+              match: %r{^\s*(@\w+|\S+\s+\S+\s+\S+\s+\S+\s+\S+)\s+(.+)$},
+              absent: '*',
+              block_eval: :instance do
 
     def post_parse(record)
       time = record.delete(:time)
-      if match = /@(\S+)/.match(time)
+      if match = %r{@(\S+)}.match(time)
         # is there another way to access the constant?
         Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS.each { |f| record[f] = :absent }
         record[:special] = match.captures[0]
-      elsif match = /(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/.match(time)
+      elsif match = %r{(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)}.match(time)
         record[:special] = :absent
-        Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS.zip(match.captures).each do |field,value|
-          if value == self.absent
-            record[field] = :absent
-          else
-            record[field] = value.split(",")
-          end
+        Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS.zip(match.captures).each do |field, value|
+          record[field] = if value == absent
+                            :absent
+                          else
+                            value.split(',')
+                          end
         end
       else
-        raise Puppet::Error, _("Line got parsed as a crontab entry but cannot be handled. Please file a bug with the contents of your crontab")
+        raise Puppet::Error, _('Line got parsed as a crontab entry but cannot be handled. Please file a bug with the contents of your crontab')
       end
       record
     end
 
     def pre_gen(record)
-      if record[:special] and record[:special] != :absent
+      if record[:special] && record[:special] != :absent
         record[:special] = "@#{record[:special]}"
       end
 
       Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS.each do |field|
-        if vals = record[field] and vals.is_a?(Array)
-          record[field] = vals.join(",")
+        if (vals = record[field]) && vals.is_a?(Array)
+          record[field] = vals.join(',')
         end
       end
       record
     end
 
     def to_line(record)
-      str = ""
+      str = ''
       record[:name] = nil if record[:unmanaged]
       str = "# Puppet Name: #{record[:name]}\n" if record[:name]
-      if record[:environment] and record[:environment] != :absent
-        str += record[:environment].map {|line| "#{line}\n"}.join('')
+      if record[:environment] && record[:environment] != :absent
+        str += record[:environment].map { |line| "#{line}\n" }.join('')
       end
-      if record[:special] and record[:special] != :absent
-        fields = [:special, :command]
-      else
-        fields = Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS + [:command]
-      end
-      str += record.values_at(*fields).map do |field|
-        if field.nil? or field == :absent
-          self.absent
+      fields = if record[:special] && record[:special] != :absent
+                 [:special, :command]
+               else
+                 Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS + [:command]
+               end
+      str += record.values_at(*fields).map { |field|
+        if field.nil? || field == :absent
+          absent
         else
           field
         end
-      end.join(self.joiner)
+      }.join(joiner)
       str
     end
   end
 
   def create
-    if resource.should(:command) then
+    if resource.should(:command)
       super
     else
-      resource.err _("no command specified, cannot create")
+      resource.err _('no command specified, cannot create')
     end
   end
 
@@ -124,15 +124,15 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
   # Return the header placed at the top of each generated file, warning
   # users that modifying this file manually is probably a bad idea.
   def self.header
-%{# HEADER: This file was autogenerated at #{Time.now} by puppet.
+    %(# HEADER: This file was autogenerated at #{Time.now} by puppet.
 # HEADER: While it can still be managed manually, it is definitely not recommended.
 # HEADER: Note particularly that the comments starting with 'Puppet Name' should
-# HEADER: not be deleted, as doing so could cause duplicate cron jobs.\n}
+# HEADER: not be deleted, as doing so could cause duplicate cron jobs.\n)
   end
 
   # Regex for finding one vixie cron header.
   def self.native_header_regex
-    /# DO NOT EDIT THIS FILE.*?Cron version.*?vixie.*?\n/m
+    %r{# DO NOT EDIT THIS FILE.*?Cron version.*?vixie.*?\n}m
   end
 
   # If a vixie cron header is found, it should be dropped, cron will insert
@@ -145,8 +145,8 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
   def self.match(record, resources)
     # if the record is named, do not even bother (#19876)
     # except the resource name was implicitly generated (#3220)
-    return false if record[:name] and !record[:unmanaged]
-    resources.each do |name, resource|
+    return false if record[:name] && !record[:unmanaged]
+    resources.each do |_name, resource|
       # Match the command first, since it's the most important one.
       next unless record[:target] == resource[:target]
       next unless record[:command] == resource.value(:command)
@@ -166,13 +166,13 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
           break
         end
 
-        if record_value = record[field] and resource_value = resource.value(field)
+        if (record_value = record[field]) && (resource_value = resource.value(field))
           # The record translates '*' into absent in the post_parse hook and
           # the resource type does exactly the opposite (alias :absent to *)
-          next if resource_value == '*' and record_value == :absent
+          next if resource_value == '*' && record_value == :absent
           next if resource_value == record_value
         end
-        matched =false
+        matched = false
         break
       end
       return resource if matched
@@ -210,12 +210,12 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
           record[:name] = name
           name = nil
         else
-          cmd_string = record[:command].gsub(/\s+/, "_")
-          index = ( @name_index += 1 )
-          record[:name] = "unmanaged:#{cmd_string}-#{ index.to_s }"
+          cmd_string = record[:command].gsub(%r{\s+}, '_')
+          index = (@name_index += 1)
+          record[:name] = "unmanaged:#{cmd_string}-#{index}"
           record[:unmanaged] = true
         end
-        if envs.nil? or envs.empty?
+        if envs.nil? || envs.empty?
           record[:environment] = :absent
         else
           # Collect all of the environment lines, and mark the records to be skipped,
@@ -236,8 +236,8 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
     # single cron line, but not in all cases (e.g., it doesn't do it
     # on my machine).  This is my attempt to fix it so the TZ lines don't
     # multiply.
-    if text =~ /(^TZ=.+\n)/
-      tz = $1
+    if text =~ %r{(^TZ=.+\n)}
+      tz = Regexp.last_match(1)
       text.sub!(tz, '')
       text = tz + text
     end
@@ -257,15 +257,15 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
     @property_hash[:user] || @property_hash[:target]
   end
 
-  CRONTAB_DIR = case Facter.value("osfamily")
-  when "Debian", "HP-UX"
-    "/var/spool/cron/crontabs"
-  when /BSD/
-    "/var/cron/tabs"
-  when "Darwin"
-    "/usr/lib/cron/tabs/"
-  else
-    "/var/spool/cron"
+  CRONTAB_DIR = case Facter.value('osfamily')
+                when 'Debian', 'HP-UX'
+                  '/var/spool/cron/crontabs'
+                when %r{BSD}
+                  '/var/cron/tabs'
+                when 'Darwin'
+                  '/usr/lib/cron/tabs/'
+                else
+                  '/var/spool/cron'
   end
 
   # Yield the names of all crontab files stored on the local system.
@@ -278,10 +278,9 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
     return unless File.readable?(CRONTAB_DIR)
     Dir.foreach(CRONTAB_DIR) do |file|
       path = "#{CRONTAB_DIR}/#{file}"
-      yield(file) if File.file?(path) and File.writable?(path)
+      yield(file) if File.file?(path) && File.writable?(path)
     end
   end
-
 
   # Include all plausible crontab files on the system
   # in the list of targets (#11383 / PUP-1381)
@@ -292,6 +291,4 @@ Puppet::Type.type(:cron).provide(:crontab, :parent => Puppet::Provider::ParsedFi
     end
     targets.uniq
   end
-
 end
-

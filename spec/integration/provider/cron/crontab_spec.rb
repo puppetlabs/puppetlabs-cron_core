@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'puppet/file_bucket/dipper'
 require 'puppet_spec/compiler'
 
-describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless => Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', unless: Puppet.features.microsoft_windows? do
   include PuppetSpec::Files
   include PuppetSpec::Compiler
 
@@ -40,9 +40,8 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
     expect(File.read(crontab_user1)).to eq(File.read(my_fixture(fixture_name)))
   end
 
-  describe "when managing a cron entry" do
-
-    it "should be able to purge unmanaged entries" do
+  describe 'when managing a cron entry' do
+    it 'is able to purge unmanaged entries' do
       apply_with_error_check(<<-MANIFEST)
       cron {
         'only managed entry':
@@ -55,8 +54,8 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
       expect_output('purged')
     end
 
-    describe "with ensure absent" do
-      it "should do nothing if entry already absent" do
+    describe 'with ensure absent' do
+      it 'does nothing if entry already absent' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'no_such_entry':
@@ -67,7 +66,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('crontab_user1')
       end
 
-      it "should remove the resource from crontab if present" do
+      it 'removes the resource from crontab if present' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'My daily failure':
@@ -78,7 +77,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('remove_named_resource')
       end
 
-      it "should remove a matching cronentry if present" do
+      it 'removes a matching cronentry if present' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'no_such_named_resource_in_crontab':
@@ -94,10 +93,9 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
       end
     end
 
-    describe "with ensure present" do
-
-      context "and no command specified" do
-        it "should work if the resource is already present" do
+    describe 'with ensure present' do
+      context 'and no command specified' do
+        it 'works if the resource is already present' do
           apply_with_error_check(<<-MANIFEST)
           cron {
             'My daily failure':
@@ -107,7 +105,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
           MANIFEST
           expect_output('crontab_user1')
         end
-        it "should fail if the resource needs creating" do
+        it 'fails if the resource needs creating' do
           manifest = <<-MANIFEST
           cron {
             'Entirely new resource':
@@ -117,7 +115,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
           MANIFEST
           apply_compiled_manifest(manifest) do |res|
             if res.ref == 'Cron[Entirely new resource]'
-              res.expects(:err).with(regexp_matches(/no command/))
+              res.expects(:err).with(regexp_matches(%r{no command}))
             else
               res.expects(:err).never
             end
@@ -125,7 +123,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         end
       end
 
-      it "should do nothing if entry already present" do
+      it 'does nothing if entry already present' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'My daily failure':
@@ -137,7 +135,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('crontab_user1')
       end
 
-      it "should work correctly when managing 'target' but not 'user'" do
+      it "works correctly when managing 'target' but not 'user'" do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'My daily failure':
@@ -149,7 +147,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('crontab_user1')
       end
 
-      it "should do nothing if a matching entry already present" do
+      it 'does nothing if a matching entry already present' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'no_such_named_resource_in_crontab':
@@ -163,7 +161,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('crontab_user1')
       end
 
-      it "should add a new normal entry if currently absent" do
+      it 'adds a new normal entry if currently absent' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'new entry':
@@ -181,7 +179,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('create_normal_entry')
       end
 
-      it "should add a new special entry if currently absent" do
+      it 'adds a new special entry if currently absent' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'new special entry':
@@ -195,7 +193,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         expect_output('create_special_entry')
       end
 
-      it "should change existing entry if out of sync" do
+      it 'changes existing entry if out of sync' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'Monthly job':
@@ -209,7 +207,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         MANIFEST
         expect_output('modify_entry')
       end
-      it "should change a special schedule to numeric if requested" do
+      it 'changes a special schedule to numeric if requested' do
         apply_with_error_check(<<-MANIFEST)
         cron {
           'My daily failure':
@@ -220,7 +218,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
         MANIFEST
         expect_output('unspecialized')
       end
-      it "should not try to move an entry from one file to another" do
+      it 'does not try to move an entry from one file to another' do
         # force the parsedfile provider to also parse user1's crontab
         apply_with_error_check(<<-MANIFEST)
         cron {
@@ -238,5 +236,4 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', :unless =
       end
     end
   end
-
 end
