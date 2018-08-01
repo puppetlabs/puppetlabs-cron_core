@@ -9,7 +9,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
 
   def compare_crontab_text(have, want)
     # We should have four header lines, and then the text...
-    expect(have.lines.to_a[0..3]).to be_all { |x| x =~ %r{^# } }
+    expect(have.lines.to_a[0..3]).to(be_all { |x| x =~ %r{^# } })
     expect(have.lines.to_a[4..-1].join('')).to eq(want)
   end
 
