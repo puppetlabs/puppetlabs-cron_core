@@ -1,0 +1,5 @@
+---
+.rubocop.yml:
+  default_configs:
+    RSpec/NamedSubject:
+      Enabled: false
