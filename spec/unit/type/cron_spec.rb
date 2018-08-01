@@ -122,8 +122,8 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       end
 
       it 'does not support invalid steps' do
-        expect { described_class.new(name: 'foo', minute: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid minute/)
-        expect { described_class.new(name: 'foo', minute: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid minute/)
+        expect { described_class.new(name: 'foo', minute: '*/A') }.to raise_error(Puppet::Error, %r{\*/A is not a valid minute})
+        expect { described_class.new(name: 'foo', minute: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid minute})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :minute => '*/120' ) }.to raise_error(Puppet::Error, /is not a valid minute/)
       end
@@ -189,8 +189,8 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       end
 
       it 'does not support invalid steps' do
-        expect { described_class.new(name: 'foo', hour: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid hour/)
-        expect { described_class.new(name: 'foo', hour: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid hour/)
+        expect { described_class.new(name: 'foo', hour: '*/A') }.to raise_error(Puppet::Error, %r{\*/A is not a valid hour})
+        expect { described_class.new(name: 'foo', hour: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid hour})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :hour => '*/26' ) }.to raise_error(Puppet::Error, /is not a valid hour/)
       end
@@ -272,8 +272,8 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       end
 
       it 'does not support invalid steps' do
-        expect { described_class.new(name: 'foo', weekday: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid weekday/)
-        expect { described_class.new(name: 'foo', weekday: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid weekday/)
+        expect { described_class.new(name: 'foo', weekday: '*/A') }.to raise_error(Puppet::Error, %r{\*/A is not a valid weekday})
+        expect { described_class.new(name: 'foo', weekday: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid weekday})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :weekday => '*/9' ) }.to raise_error(Puppet::Error, /is not a valid weekday/)
       end
@@ -371,8 +371,8 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       end
 
       it 'does not support invalid steps' do
-        expect { described_class.new(name: 'foo', month: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid month/)
-        expect { described_class.new(name: 'foo', month: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid month/)
+        expect { described_class.new(name: 'foo', month: '*/A') }.to raise_error(Puppet::Error, %r{\*/A is not a valid month})
+        expect { described_class.new(name: 'foo', month: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid month})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :month => '*/13' ) }.to raise_error(Puppet::Error, /is not a valid month/)
       end
@@ -436,8 +436,8 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       end
 
       it 'does not support invalid steps' do
-        expect { described_class.new(name: 'foo', monthday: '*/A') }.to raise_error(Puppet::Error, /\*\/A is not a valid monthday/)
-        expect { described_class.new(name: 'foo', monthday: '*/2A') }.to raise_error(Puppet::Error, /\*\/2A is not a valid monthday/)
+        expect { described_class.new(name: 'foo', monthday: '*/A') }.to raise_error(Puppet::Error, %r{\*/A is not a valid monthday})
+        expect { described_class.new(name: 'foo', monthday: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid monthday})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :monthday => '*/32' ) }.to raise_error(Puppet::Error, /is not a valid monthday/)
       end

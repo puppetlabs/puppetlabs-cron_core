@@ -33,6 +33,6 @@ agents.each do |host|
 
   step 'verify that crontab -l contains what you expected'
   run_cron_on(host, :list, 'tstuser') do
-    assert_no_match(/\/bin\/true/, stderr, "Error: Found entry for tstuser on #{host}")
+    assert_no_match(%r{/bin/true}, stderr, "Error: Found entry for tstuser on #{host}")
   end
 end

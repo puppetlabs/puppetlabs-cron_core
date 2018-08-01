@@ -30,6 +30,6 @@ agents.each do |host|
 
   step 'verify that crontab -l contains what you expected'
   run_cron_on(host, :list, 'tstuser') do
-    assert_match(/\* \* \* \* \* \/bin\/true/, stdout, "Incorrect crontab for tstuser on #{host}")
+    assert_match(%r{\* \* \* \* \* /bin/true}, stdout, "Incorrect crontab for tstuser on #{host}")
   end
 end

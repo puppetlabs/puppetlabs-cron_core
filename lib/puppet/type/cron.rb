@@ -156,8 +156,8 @@ Puppet::Type.newtype(:cron) do
         return :absent
       end
 
-      # Allow the */2 syntax
-      if value =~ /^\*\/[0-9]+$/
+      # Allow step syntax
+      if value =~ %r{^\*/[0-9]+$}
         return value
       end
 
@@ -166,8 +166,8 @@ Puppet::Type.newtype(:cron) do
         return value
       end
 
-      # Allow ranges + */2
-      if value =~ /^[0-9]+-[0-9]+\/[0-9]+$/
+      # Allow ranges with step
+      if value =~ %r{^[0-9]+-[0-9]+/[0-9]+$}
         return value
       end
 

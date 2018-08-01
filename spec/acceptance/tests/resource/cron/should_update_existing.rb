@@ -27,7 +27,7 @@ agents.each do |host|
 
   step 'verify that crontab -l contains what you expected'
   run_cron_on(host, :list, 'tstuser') do
-    assert_match(/\* \* \* \* \* \/bin\/true/, stdout, "Didn't find correct crobtab entry for tstuser on #{host}")
+    assert_match(%r{\* \* \* \* \* /bin/true}, stdout, "Didn't find correct crobtab entry for tstuser on #{host}")
   end
 
   step 'apply the resource change on the host'
@@ -37,6 +37,6 @@ agents.each do |host|
 
   step 'verify that crontab -l contains what you expected'
   run_cron_on(host, :list, 'tstuser') do
-    assert_match(/\* 0-6 \* \* \* \/bin\/true/, stdout, "Didn't find correctly modified time entry in crobtab entry for tstuser on #{host}")
+    assert_match(%r{\* 0-6 \* \* \* /bin/true}, stdout, "Didn't find correctly modified time entry in crobtab entry for tstuser on #{host}")
   end
 end
