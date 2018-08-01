@@ -8,7 +8,7 @@ module PuppetSpec::Files
   def self.cleanup
     # rubocop:disable Style/GlobalVars
     $global_tempfiles ||= []
-    while path = $global_tempfiles.pop
+    $global_tempfiles.each do |path|
       begin
         Dir.unstub(:entries)
         FileUtils.rm_rf path, secure: true
@@ -16,6 +16,7 @@ module PuppetSpec::Files
         # nothing to do
       end
     end
+    $global_tempfiles = []
     # rubocop:enable Style/GlobalVars
   end
 

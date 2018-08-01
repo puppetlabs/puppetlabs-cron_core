@@ -178,7 +178,8 @@ Puppet::Type.newtype(:cron) do
       return value unless self.class.boundaries
       lower, upper = self.class.boundaries
       retval = nil
-      if num = numfix(value)
+      num = numfix(value)
+      if num
         retval = limitcheck(num, lower, upper)
       elsif respond_to?(:alpha)
         # If it has an alpha method defined, then we check
@@ -396,7 +397,8 @@ Puppet::Type.newtype(:cron) do
 
     defaultto do
       if provider.is_a?(@resource.class.provider(:crontab))
-        if val = @resource.should(:user)
+        val = @resource.should(:user)
+        if val
           val
         else
           struct = Etc.getpwuid(Process.uid)
@@ -450,10 +452,9 @@ Puppet::Type.newtype(:cron) do
   def value(name)
     name = name.to_sym
     ret = nil
-    if obj = @parameters[name]
-      ret = obj.should
-
-      ret ||= obj.retrieve
+    obj = @parameters[name]
+    if obj
+      ret = obj.should || obj.retrieve
 
       if ret == :absent
         ret = nil

@@ -34,11 +34,16 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
 
     def post_parse(record)
       time = record.delete(:time)
-      if match = %r{@(\S+)}.match(time)
+      match = %r{@(\S+)}.match(time)
+      if match
         # is there another way to access the constant?
         Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS.each { |f| record[f] = :absent }
         record[:special] = match.captures[0]
-      elsif match = %r{(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)}.match(time)
+        return record
+      end
+
+      match = %r{(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)}.match(time)
+      if match
         record[:special] = :absent
         Puppet::Type::Cron::ProviderCrontab::TIME_FIELDS.zip(match.captures).each do |field, value|
           record[field] = if value == absent
@@ -47,10 +52,11 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
                             value.split(',')
                           end
         end
-      else
-        raise Puppet::Error, _('Line got parsed as a crontab entry but cannot be handled. Please file a bug with the contents of your crontab')
+
+        return record
       end
-      record
+
+      raise Puppet::Error, _('Line got parsed as a crontab entry but cannot be handled. Please file a bug with the contents of your crontab')
     end
 
     def pre_gen(record)
