@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'puppet/file_bucket/dipper'
 require 'puppet_spec/compiler'
 
-describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', unless: Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:cron).provider(:crontab), unless: Puppet.features.microsoft_windows? do
   include PuppetSpec::Files
   include PuppetSpec::Compiler
 
