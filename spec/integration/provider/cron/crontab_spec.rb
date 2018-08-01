@@ -9,7 +9,7 @@ describe Puppet::Type.type(:cron).provider(:crontab), unless: Puppet.features.mi
   before :each do
     Puppet::Type.type(:cron).stubs(:defaultprovider).returns described_class
     described_class.stubs(:suitable?).returns true
-    Puppet::FileBucket::Dipper.any_instance.stubs(:backup) # Don't backup to filebucket
+    Puppet::FileBucket::Dipper.any_instance.stubs(:backup) # rubocop:disable RSpec/AnyInstance
 
     # I don't want to execute anything
     described_class.stubs(:filetype).returns Puppet::Util::FileType::FileTypeFlat
