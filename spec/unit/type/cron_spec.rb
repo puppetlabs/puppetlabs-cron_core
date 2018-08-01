@@ -46,7 +46,7 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       end
 
       it 'supports absent as a value for ensure' do
-        expect { described_class.new(name: 'foo', ensure: :present) }.not_to raise_error
+        expect { described_class.new(name: 'foo', ensure: :absent) }.not_to raise_error
       end
 
       it 'does not support other values' do

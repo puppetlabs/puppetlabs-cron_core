@@ -136,13 +136,13 @@ describe Puppet::Type.type(:cron).provider(:crontab), '(integration)', unless: P
       it "works correctly when managing 'target' but not 'user'" do
         apply_with_error_check(<<-MANIFEST)
         cron {
-          'My daily failure':
-            special => 'daily',
+          'My weekly failure':
+            special => 'weekly',
             command => '/bin/false',
             target  => '#{crontab_user1}',
         }
         MANIFEST
-        expect_output('crontab_user1')
+        expect_output('crontab_user3')
       end
 
       it 'does nothing if a matching entry already present' do
