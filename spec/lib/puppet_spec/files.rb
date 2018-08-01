@@ -6,6 +6,7 @@ require 'pathname'
 # A support module for testing files.
 module PuppetSpec::Files
   def self.cleanup
+    # rubocop:disable Style/GlobalVars
     $global_tempfiles ||= []
     while path = $global_tempfiles.pop
       begin
@@ -15,6 +16,7 @@ module PuppetSpec::Files
         # nothing to do
       end
     end
+    # rubocop:enable Style/GlobalVars
   end
 
   module_function
@@ -91,9 +93,10 @@ module PuppetSpec::Files
   end
 
   def record_tmp(tmp)
-    # ...record it for cleanup,
+    # rubocop:disable Style/GlobalVars
     $global_tempfiles ||= []
     $global_tempfiles << tmp
+    # rubocop:enable Style/GlobalVars
   end
 
   def expect_file_mode(file, mode)
