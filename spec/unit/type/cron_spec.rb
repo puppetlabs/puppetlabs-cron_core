@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
   let(:simple_provider) do
-    @provider_class = described_class.provide(:simple) { mk_resource_methods }
-    @provider_class.stubs(:suitable?).returns true
-    @provider_class
+    provider_class = described_class.provide(:simple) { mk_resource_methods }
+    provider_class.stubs(:suitable?).returns true
+    provider_class
   end
 
   before :each do
-    described_class.stubs(:defaultprovider).returns @provider_class
+    described_class.stubs(:defaultprovider).returns simple_provider
   end
 
   after :each do
@@ -505,20 +505,21 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
   end
 
   describe 'when autorequiring resources' do
+    let(:user_bob) { Puppet::Type.type(:user).new(name: 'bob', ensure: :present) }
+    let(:user_alice) { Puppet::Type.type(:user).new(name: 'alice', ensure: :present) }
+    let(:catalog) { Puppet::Resource::Catalog.new }
+
     before :each do
-      @user_bob = Puppet::Type.type(:user).new(name: 'bob', ensure: :present)
-      @user_alice = Puppet::Type.type(:user).new(name: 'alice', ensure: :present)
-      @catalog = Puppet::Resource::Catalog.new
-      @catalog.add_resource @user_bob, @user_alice
+      catalog.add_resource user_bob, user_alice
     end
 
     it 'autorequires the user' do
-      @resource = described_class.new(name: 'dummy', command: '/usr/bin/uptime', user: 'alice')
-      @catalog.add_resource @resource
-      req = @resource.autorequire
+      resource = described_class.new(name: 'dummy', command: '/usr/bin/uptime', user: 'alice')
+      catalog.add_resource resource
+      req = resource.autorequire
       expect(req.size).to eq(1)
-      expect(req[0].target).to eq(@resource)
-      expect(req[0].source).to eq(@user_alice)
+      expect(req[0].target).to eq(resource)
+      expect(req[0].source).to eq(user_alice)
     end
   end
 
