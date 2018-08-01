@@ -272,7 +272,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
                   '/usr/lib/cron/tabs/'
                 else
                   '/var/spool/cron'
-  end
+                end
 
   # Yield the names of all crontab files stored on the local system.
   #
