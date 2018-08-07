@@ -119,12 +119,8 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
   def self.resource_for_record(record, resources)
     resource = super
 
-    if resource
-      target = resource[:target] || resource[:user]
-      if record[:target] == target
-        resource
-      end
-    end
+    target = resource[:target] || resource[:user] if resource
+    return resource if record[:target] == target
   end
 
   # Return the header placed at the top of each generated file, warning

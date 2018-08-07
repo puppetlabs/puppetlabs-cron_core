@@ -188,11 +188,8 @@ Puppet::Type.newtype(:cron) do
         retval = alphacheck(value, alpha)
       end
 
-      if retval
-        return retval.to_s
-      else
-        self.fail _('%{value} is not a valid %{name}') % { value: value, name: self.class.name }
-      end
+      raise _('%{value} is not a valid %{name}') % { value: value, name: self.class.name } unless retval
+      return retval.to_s if retval
     end
   end
 
