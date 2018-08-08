@@ -188,7 +188,8 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
   def self.prefetch_hook(records)
     name = nil
     envs = nil
-    result = records.each { |record|
+    result = []
+    records.each do |record|
       case record[:record_type]
       when :comment
         if record[:name]
@@ -228,7 +229,8 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
           envs = nil
         end
       end
-    }.reject { |record| record[:skip] }
+      result << record unless record[:skip]
+    end
     result
   end
 
