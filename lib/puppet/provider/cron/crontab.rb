@@ -206,7 +206,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
           envs << record[:line]
           record[:skip] = true
         end
-      when :blank
+      when :blank # rubocop: disable Lint/EmptyWhen
         # nothing
       else
         if name
