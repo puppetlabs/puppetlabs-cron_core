@@ -102,8 +102,8 @@ Puppet::Type.newtype(:cron) do
             return index
           end
         end
-      else
-        return ary.index(tmp) if ary.include?(tmp)
+      elsif ary.include?(tmp)
+        return ary.index(tmp)
       end
 
       false
