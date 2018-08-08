@@ -459,12 +459,7 @@ Puppet::Type.newtype(:cron) do
     end
 
     unless ret
-      case name
-      when :command
-      when :special
-        # nothing
-      else
-        # ret = (self.class.validproperty?(name).default || "*").to_s
+      unless [:command, :special].include? name
         ret = '*'
       end
     end
