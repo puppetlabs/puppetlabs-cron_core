@@ -128,17 +128,17 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       subject.stubs(:prefetch_all_targets).returns([record])
     end
 
-# this would be a more fitting test, but I haven't yet
-# figured out how to get it working
-#    it "should include both jobs in the output" do
-#      subject.prefetch(resources)
-#      class Puppet::Provider::ParsedFile
-#        def self.records
-#          @records
-#        end
-#      end
-#      subject.to_file(subject.records).should match /Puppet name: test/
-#    end
+    # this would be a more fitting test, but I haven't yet
+    # figured out how to get it working
+    #    it "should include both jobs in the output" do
+    #      subject.prefetch(resources)
+    #      class Puppet::Provider::ParsedFile
+    #        def self.records
+    #          @records
+    #        end
+    #      end
+    #      subject.to_file(subject.records).should match /Puppet name: test/
+    #    end
 
     it "does not base the new resource's provider on the existing record" do
       subject.expects(:new).with(record).never
