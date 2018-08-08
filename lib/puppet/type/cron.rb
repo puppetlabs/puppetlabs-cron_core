@@ -120,7 +120,7 @@ Puppet::Type.newtype(:cron) do
       end
     end
 
-    def is_to_s(value = @is)
+    def is_to_s(value = @is) # rubocop: disable Style/PredicateName
       if value
         if value.is_a?(Array) && (name == :command || value[0].is_a?(Symbol))
           value = value[0]
