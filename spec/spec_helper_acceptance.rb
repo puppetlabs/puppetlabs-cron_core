@@ -11,8 +11,6 @@ def compatible_agents
   agents.reject { |agent| agent['platform'].include?('windows') || agent['platform'].include?('eos-') || agent['platform'].include?('fedora-28') }
 end
 
-
-
 RSpec.configure do |c|
   c.before :suite do
     unless ENV['BEAKER_provision'] == 'no'
