@@ -4,16 +4,16 @@ require 'puppet/util/filetype'
 
 Puppet::Type.newtype(:cron) do
   @doc = <<-'EOT'
-    Installs and manages cron jobs.  Every cron resource created by Puppet
+    Installs and manages cron jobs. Every cron resource created by Puppet
     requires a command and at least one periodic attribute (hour, minute,
-    month, monthday, weekday, or special).  While the name of the cron job is
+    month, monthday, weekday, or special). While the name of the cron job is
     not part of the actual job, the name is stored in a comment beginning with
     `# Puppet Name: `. These comments are used to match crontab entries created
     by Puppet with cron resources.
 
     If an existing crontab entry happens to match the scheduling and command of a
-    cron resource that has never been synced, Puppet will defer to the existing
-    crontab entry and will not create a new entry tagged with the `# Puppet Name: `
+    cron resource that has never been synced, Puppet defers to the existing
+    crontab entry and does not create a new entry tagged with the `# Puppet Name: `
     comment.
 
     Example:
@@ -43,7 +43,7 @@ Puppet::Type.newtype(:cron) do
           minute  => '*/10',
         }
 
-    An important note: _the Cron type will not reset parameters that are
+    **Important:** _The Cron type will not reset parameters that are
     removed from a manifest_. For example, removing a `minute => 10` parameter
     will not reset the minute component of the associated cronjob to `*`.
     These changes must be expressed by setting the parameter to
