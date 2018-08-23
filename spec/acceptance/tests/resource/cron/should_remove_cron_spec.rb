@@ -1,8 +1,6 @@
 require 'spec_helper_acceptance'
-require 'puppet/acceptance/common_utils'
-extend Puppet::Acceptance::CronUtils
 
-Rspec.context 'when removing crontab' do
+RSpec.context 'when removing crontab' do
   before(:each) do
     compatible_agents.each do |agent|
       step 'ensure the user exists via puppet'
@@ -28,9 +26,9 @@ Rspec.context 'when removing crontab' do
         expect(stdout).to match(%r{crontest\D+ensure:\s+removed})
       end
 
-      step 'verify that crontab -l contains what you expected'
+      step ' contains what you expected'
       run_cron_on(host, :list, 'tstuser') do
-        expect(stderr).to match(%r{/bin/true})
+        expect(stderr).not_to match(%r{/bin/true})
       end
     end
   end

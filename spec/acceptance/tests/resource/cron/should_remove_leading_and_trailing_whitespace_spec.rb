@@ -1,8 +1,6 @@
 require 'spec_helper_acceptance'
-require 'puppet/acceptance/common_utils'
-extend Puppet::Acceptance::CronUtils
 
-Rspec.context 'when stripping whitespace from cron jobs' do
+RSpec.context 'when stripping whitespace from cron jobs' do
   before(:each) do
     compatible_agents.each do |agent|
       step 'ensure the user exists via puppet'

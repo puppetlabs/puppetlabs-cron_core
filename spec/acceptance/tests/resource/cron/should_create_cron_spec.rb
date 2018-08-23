@@ -1,8 +1,6 @@
 require 'spec_helper_acceptance'
-require 'puppet/acceptance/common_utils'
-extend Puppet::Acceptance::CronUtils
 
-Rspec.context 'when creating cron' do
+RSpec.context 'when creating cron' do
   before(:each) do
     compatible_agents.each do |agent|
       step 'ensure the user exists via puppet'
@@ -18,7 +16,7 @@ Rspec.context 'when creating cron' do
   end
 
   compatible_agents.each do |host|
-    it 'creates a cron' do
+    it 'creates a new cron job' do
       step 'apply the resource on the host using puppet resource'
       on(host, puppet_resource('cron', 'crontest', 'user=tstuser', 'command=/bin/true', 'ensure=present')) do
         expect(stdout).to match(%r{created})

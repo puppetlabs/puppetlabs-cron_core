@@ -1,8 +1,6 @@
 require 'spec_helper_acceptance'
-require 'puppet/acceptance/common_utils'
-extend Puppet::Acceptance::CronUtils
 
-Rspec.context 'when removing crontabs' do
+RSpec.context 'when removing crontabs' do
   before(:each) do
     compatible_agents.each do |agent|
       step 'ensure the user exists via puppet'
