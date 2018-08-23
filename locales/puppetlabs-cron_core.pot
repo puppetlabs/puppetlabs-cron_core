@@ -1,0 +1,43 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2018 Puppet, Inc.
+# This file is distributed under the same license as the puppetlabs-cron_core package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: puppetlabs-cron_core \n"
+"Report-Msgid-Bugs-To: docs@puppet.com\n"
+"POT-Creation-Date: 2018-08-23 13:54-0700\n"
+"PO-Revision-Date: 2018-08-23 13:54-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ../lib/puppet/provider/cron/crontab.rb:59
+msgid "Line got parsed as a crontab entry but cannot be handled. Please file a bug with the contents of your crontab"
+msgstr ""
+
+#: ../lib/puppet/provider/cron/crontab.rb:102
+msgid "no command specified, cannot create"
+msgstr ""
+
+#: ../lib/puppet/type/cron.rb:191
+msgid "%{value} is not a valid %{name}"
+msgstr ""
+
+#: ../lib/puppet/type/cron.rb:249
+msgid "Invalid special schedule %{value}"
+msgstr ""
+
+#: ../lib/puppet/type/cron.rb:326
+msgid "Invalid environment setting %{value}"
+msgstr ""
+
+#: ../lib/puppet/type/cron.rb:420
+msgid "%{cron} cannot specify both a special schedule and a value for %{field}"
+msgstr ""
