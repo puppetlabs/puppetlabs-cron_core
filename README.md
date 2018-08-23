@@ -4,21 +4,13 @@
 #### Table of Contents
 
 1. [Description](#description)
-2. [Setup - The basics of getting started with cron_core](#setup)
-    * [What cron_core affects](#what-cron_core-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with cron_core](#beginning-with-cron_core)
-3. [Usage - Configuration options and additional functionality](#usage)
+3. [Reference](#reference)
 4. [Limitations - OS compatibility, etc.](#limitations)
 5. [Development - Guide for contributing to the module](#development)
 
 ## Description
 
 Install and manage `cron` resources.
-
-
-## Usage
-
 
 ## Reference
 
@@ -39,7 +31,7 @@ This command will create a browsable \_index.html file in the doc directory. The
 
 ## Limitations
 
-`cron` is not compatible with Windows or Fedora 28.
+`cron` is not compatible Windows or Fedora 28.
 
 ## Development
 
