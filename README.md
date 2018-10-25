@@ -31,7 +31,7 @@ This command will create a browsable \_index.html file in the doc directory. The
 
 ## Limitations
 
-`cron` is not compatible Windows or Fedora 28.
+`cron` is not compatible with Windows or Fedora 28.
 
 ## Development
 
