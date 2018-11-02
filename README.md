@@ -20,7 +20,7 @@ This module is documented using Puppet Strings.
 
 For a quick primer on how Strings works, please see [this blog post](https://puppet.com/blog/using-puppet-strings-generate-great-documentation-puppet-modules) or the [README.md](https://github.com/puppetlabs/puppet-strings/blob/master/README.md) for Puppet Strings.
 
-To generate documentation locally, run:
+To generate documentation locally, run the following command:
 
 ```
 bundle install
