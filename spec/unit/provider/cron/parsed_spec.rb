@@ -195,10 +195,14 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       end
 
       it 'contains no resources for a user who has no crontab, or for a user that is absent' do
-        Puppet::Util::Execution
-          .expects(:execute)
-          .with('crontab -u foobar -l', failonfail: true, combine: true)
-          .returns('')
+        if Puppet.version.to_f < 5.0
+          described_class.target_object('foobar').expects(:`).with('crontab -u foobar -l 2>/dev/null').returns ''
+        else
+          Puppet::Util::Execution
+            .expects(:execute)
+            .with('crontab -u foobar -l', failonfail: true, combine: true)
+            .returns('')
+        end
         expect(described_class.instances.select do |resource|
           resource.get('target') == 'foobar'
         end).to be_empty
