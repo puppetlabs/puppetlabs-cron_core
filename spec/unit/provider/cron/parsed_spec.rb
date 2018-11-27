@@ -195,12 +195,10 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       end
 
       it 'contains no resources for a user who has no crontab, or for a user that is absent' do
-        # `crontab...` does only capture stdout here. On vixie-cron-4.1
-        # STDERR shows "no crontab for foobar" but stderr is ignored as
-        # well as the exitcode.
-        # STDERR shows "crontab:  user `foobar' unknown" but stderr is
-        # ignored as well as the exitcode
-        described_class.target_object('foobar').expects(:`).with('crontab -u foobar -l 2>/dev/null').returns ''
+        Puppet::Util::Execution
+          .expects(:execute)
+          .with('crontab -u foobar -l', failonfail: true, combine: true)
+          .returns('')
         expect(described_class.instances.select do |resource|
           resource.get('target') == 'foobar'
         end).to be_empty
