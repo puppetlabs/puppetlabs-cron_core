@@ -4,9 +4,9 @@
 #### Table of Contents
 
 1. [Description](#description)
-3. [Reference](#reference)
-4. [Limitations - OS compatibility, etc.](#limitations)
-5. [Development - Guide for contributing to the module](#development)
+2. [Reference](#reference)
+3. [Limitations - OS compatibility, etc.](#limitations)
+4. [Development - Guide for contributing to the module](#development)
 
 ## Description
 
@@ -14,7 +14,7 @@ Install and manage `cron` resources.
 
 ## Reference
 
-Please see `REFERENCE.md` for the reference documentation.
+Please see [`REFERENCE.md`](REFERENCE.md) for the reference documentation.
 
 This module is documented using Puppet Strings.
 

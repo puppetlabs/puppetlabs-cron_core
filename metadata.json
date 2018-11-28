@@ -5,6 +5,7 @@
   "summary": "Install and manage cron resources.",
   "license": "Apache-2.0",
   "source": "https://github.com/puppetlabs/puppetlabs-cron_core",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-cron_core",
   "issues_url": "https://tickets.puppetlabs.com/projects/MODULES",
   "dependencies": [
 
