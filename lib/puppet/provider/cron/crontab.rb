@@ -1,3 +1,4 @@
+require_relative 'filetype'
 require 'puppet/provider/parsedfile'
 
 Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile, default_target: ENV['USER'] || 'root') do
@@ -21,7 +22,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
                 :crontab
               end
 
-    Puppet::Util::FileType.filetype(tabname)
+    Puppet::Provider::Cron::FileType.filetype(tabname)
   end
 
   self::TIME_FIELDS = [:minute, :hour, :monthday, :month, :weekday].freeze
