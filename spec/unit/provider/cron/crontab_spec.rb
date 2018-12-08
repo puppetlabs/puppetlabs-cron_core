@@ -202,4 +202,43 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       end
     end
   end
+
+  context '#enumerate_crontabs' do
+    before(:each) do
+      File.expects(:readable?).with(subject.crontab_dir).returns(true)
+      Dir.expects(:foreach).with(subject.crontab_dir).multiple_yields(*files)
+    end
+
+    context 'only a hidden file' do
+      let(:files) { ['.keep_cronbase-0'] }
+
+      before(:each) do
+        files.each do |filename|
+          path = File.join(subject.crontab_dir, filename)
+          File.expects(:file?).with(path).returns(true)
+          File.expects(:writable?).with(path).returns(true)
+        end
+      end
+
+      it 'ignores .keep_* files' do
+        expect { |b| described_class.enumerate_crontabs(&b) }.not_to yield_control
+      end
+    end
+
+    context 'multiple files' do
+      let(:files) { ['myuser', '.keep_cronbase-0'] }
+
+      before(:each) do
+        files.each do |filename|
+          path = File.join(subject.crontab_dir, filename)
+          File.expects(:file?).with(path).returns(true)
+          File.expects(:writable?).with(path).returns(true)
+        end
+      end
+
+      it 'ignores .keep_* files' do
+        expect { |b| described_class.enumerate_crontabs(&b) }.to yield_control.once
+      end
+    end
+  end
 end

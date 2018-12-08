@@ -273,17 +273,27 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
                   '/var/spool/cron'
                 end
 
+  # Return the directory holding crontab files stored on the local system.
+  #
+  # @api private
+  def self.crontab_dir
+    CRONTAB_DIR
+  end
+
   # Yield the names of all crontab files stored on the local system.
   #
-  # @note Ignores files that are not writable for the puppet process.
+  # @note Ignores files that are not writable for the puppet process and hidden
+  #   files that start with .keep
   #
   # @api private
   def self.enumerate_crontabs
     Puppet.debug "looking for crontabs in #{CRONTAB_DIR}"
     return unless File.readable?(CRONTAB_DIR)
     Dir.foreach(CRONTAB_DIR) do |file|
-      path = "#{CRONTAB_DIR}/#{file}"
-      yield(file) if File.file?(path) && File.writable?(path)
+      path = File.join(CRONTAB_DIR, file)
+      # Gentoo creates .keep_PACKAGE-SLOT files to make sure the directory is not
+      # removed
+      yield(file) if File.file?(path) && File.writable?(path) && !file.start_with?('.keep_')
     end
   end
 
