@@ -1,0 +1,5 @@
+# Puppet Name: pe-mcollective-metadata
+0,15,30,45 * * * * /opt/puppet/sbin/refresh-mcollective-metadata
+# Puppet Name: pe-puppet-console-prune-task
+* 1 * * * /opt/puppet/bin/rake -f /opt/puppet/share/puppet-dashboard/Rakefile RAILS_ENV=production reports:prune reports:prune:failed upto=30 unit=day > /dev/null
+0 2 * * * /usr/sbin/logrotate

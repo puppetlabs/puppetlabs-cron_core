@@ -64,17 +64,17 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
   describe 'when determining the correct filetype' do
     it 'uses the suntab filetype on Solaris' do
       Facter.stubs(:value).with(:osfamily).returns 'Solaris'
-      expect(described_class.filetype).to eq(Puppet::Util::FileType::FileTypeSuntab)
+      expect(described_class.filetype).to eq(Puppet::Provider::Cron::FileType::FileTypeSuntab)
     end
 
     it 'uses the aixtab filetype on AIX' do
       Facter.stubs(:value).with(:osfamily).returns 'AIX'
-      expect(described_class.filetype).to eq(Puppet::Util::FileType::FileTypeAixtab)
+      expect(described_class.filetype).to eq(Puppet::Provider::Cron::FileType::FileTypeAixtab)
     end
 
     it 'uses the crontab filetype on other platforms' do
       Facter.stubs(:value).with(:osfamily).returns 'Not a real operating system family'
-      expect(described_class.filetype).to eq(Puppet::Util::FileType::FileTypeCrontab)
+      expect(described_class.filetype).to eq(Puppet::Provider::Cron::FileType::FileTypeCrontab)
     end
   end
 
@@ -194,18 +194,23 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
         Facter.stubs(:value).with(:operatingsystem)
       end
 
-      it 'contains no resources for a user who has no crontab, or for a user that is absent' do
-        if Puppet.version.to_f < 5.0
-          described_class.target_object('foobar').expects(:`).with('crontab -u foobar -l 2>/dev/null').returns ''
-        else
-          Puppet::Util::Execution
-            .expects(:execute)
-            .with('crontab -u foobar -l', failonfail: true, combine: true)
-            .returns('')
-        end
+      it 'contains no resources for a user who has no crontab' do
+        Puppet::Util.stubs(:uid).returns(10)
+
+        Puppet::Util::Execution
+          .expects(:execute)
+          .with('crontab -u foobar -l', failonfail: true, combine: true)
+          .returns('')
+
         expect(described_class.instances.select do |resource|
           resource.get('target') == 'foobar'
         end).to be_empty
+      end
+
+      it 'contains no resources for a user who is absent' do
+        Puppet::Util.stubs(:uid).returns(nil)
+
+        expect(described_class.instances).to be_empty
       end
 
       it 'is able to create records from not-managed records' do
