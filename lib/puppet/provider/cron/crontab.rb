@@ -1,7 +1,7 @@
 require_relative 'filetype'
 require 'puppet/provider/parsedfile'
 
-Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile, default_target: ENV['USER'] || 'root') do
+Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile, default_target: ENV['USER'] || 'root', raise_prefetch_errors: true) do
   commands crontab: 'crontab'
 
   text_line :comment, match: %r{^\s*#}, post_parse: proc { |record|
