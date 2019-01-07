@@ -10,7 +10,7 @@ def beaker_opts
 end
 
 def compatible_agents
-  agents.reject { |agent| agent['platform'].include?('windows') || agent['platform'].include?('eos-') || agent['platform'].include?('fedora-28') }
+  agents.reject { |agent| agent['platform'].include?('windows') || agent['platform'].include?('eos-') }
 end
 
 def clean(agent, o = {})
@@ -23,7 +23,7 @@ def setup(agent, o = {})
   o = { user: 'tstuser' }.merge(o)
   apply_manifest_on(agent, %(user { '%s': ensure => present, managehome => false }) % o[:user])
   apply_manifest_on(agent, %(case $operatingsystem {
-                                centos, redhat: {$cron = 'cronie'}
+                                centos, redhat, fedora: {$cron = 'cronie'}
                                 solaris: { $cron = 'core-os' }
                                 default: {$cron ='cron'} }
                                 package {'cron': name=> $cron, ensure=>present, }))
