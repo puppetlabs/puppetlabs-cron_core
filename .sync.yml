@@ -1,6 +1,8 @@
 ---
 .rubocop.yml:
   default_configs:
+    Metrics/LineLength:
+      Max: 260
     RSpec/NamedSubject:
       Enabled: false
 
