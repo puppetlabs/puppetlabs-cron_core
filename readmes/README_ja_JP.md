@@ -4,9 +4,9 @@
 #### 目次
 
 1. [説明](#description)
-3. [リファレンス](#reference)
-4. [制約 - OS互換性など](#limitations)
-5. [開発 - モジュール貢献についてのガイド](#development)
+2. [リファレンス](#reference)
+3. [制約 - OS互換性など](#limitations)
+4. [開発 - モジュール貢献についてのガイド](#development)
 
 <a id="description"></a>
 ## 説明
@@ -16,13 +16,13 @@
 <a id="reference"></a>
 ## リファレンス
 
-リファレンス文書については、`REFERENCE.md`を参照してください。
+リファレンス文書については、REFERENCE.mdを参照してください。
 
 このモジュールは、Puppet Stringsを用いて文書化されています。
 
 Stringsの仕組みの簡単な概要については、Puppet Stringsに関する[こちらのブログ記事](https://puppet.com/blog/using-puppet-strings-generate-great-documentation-puppet-modules)または[README.md](https://github.com/puppetlabs/puppet-strings/blob/master/README.md)を参照してください。
 
-文書をローカルで作成するには、以下を実行します。
+文書をローカルで作成するには、以下のコマンドを実行します。
 
 ```
 bundle install
