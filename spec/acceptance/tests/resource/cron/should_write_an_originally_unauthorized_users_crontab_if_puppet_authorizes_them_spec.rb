@@ -1,17 +1,6 @@
 require 'spec_helper_acceptance'
 
 RSpec.context 'when Puppet authorizes a previously unauthorized user to use crontab' do
-  class << self
-    alias_method :orig_compatible_agents, :compatible_agents
-
-    # This test is confined to AIX and Solaris agents only.
-    def compatible_agents
-      orig_compatible_agents.select do |agent|
-        agent['platform'].include?('aix') || agent['platform'].include?('solaris')
-      end
-    end
-  end
-
   let(:username) { "pl#{rand(999_999).to_i}" }
   let(:unauthorized_username) { "pl#{rand(999_999).to_i}" }
 
@@ -70,7 +59,9 @@ RSpec.context 'when Puppet authorizes a previously unauthorized user to use cron
   end
 
   compatible_agents.each do |agent|
-    it "should write that user's crontab on #{agent}" do
+    is_aix_or_solaris_agent = agent['platform'].include?('aix') || agent['platform'].include?('solaris')
+
+    it "should write that user's crontab on #{agent}", if: is_aix_or_solaris_agent do
       step 'Add the unauthorized user to the cron.deny file' do
         on(agent, "echo #{unauthorized_username} >> #{cron_deny_path[agent]}")
       end
