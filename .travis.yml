@@ -9,6 +9,7 @@ before_install:
   - gem --version
   - bundle -v
 script:
+  - if [ -z "$TRAVIS_TAG" ]; then echo "Pull request not labeled."; exit 1; fi
   - 'bundle exec rake $CHECK'
 bundler_args: --without system_tests
 rvm:
