@@ -263,7 +263,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
   end
 
   CRONTAB_DIR = case Facter.value('osfamily')
-                when 'Debian', 'HP-UX'
+                when 'Debian', 'HP-UX', 'Solaris'
                   '/var/spool/cron/crontabs'
                 when %r{BSD}
                   '/var/cron/tabs'
