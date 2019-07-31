@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+
+## [1.0.2](https://github.com/puppetlabs/puppetlabs-cron_core/tree/1.0.2) (2019-07-31)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/1.0.1...1.0.2)
+
+### Added
+- \(PUP-9697\) Updated crontab read path for Solaris changes [\#23](https://github.com/puppetlabs/puppetlabs-cron_core/pull/23) ([sebastian-miclea](https://github.com/sebastian-miclea))
+
 ## [1.0.1](https://github.com/puppetlabs/puppetlabs-cron_core/tree/1.0.1) (2019-02-07)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/1.0.0...1.0.1)
