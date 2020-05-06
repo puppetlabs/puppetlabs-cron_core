@@ -109,6 +109,8 @@ must be either:
 -   A number between 0 and 7, inclusive, with 0 or 7 being Sunday
 -   The name of the day, such as 'Tuesday'.
 
+Day ranges can only be numeric; e.g. '1-5' for weekdays, but not 'Mon-Fri'.
+
 ##### `month`
 
 The month of the year. Optional; if specified,
