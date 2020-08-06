@@ -127,6 +127,15 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :minute => '*/120' ) }.to raise_error(Puppet::Error, /is not a valid minute/)
       end
+
+      it 'supports values with leading zeros' do
+        expect { described_class.new(name: 'foo', minute: ['0', '0011', '044']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: '022') }.not_to raise_error
+      end
+
+      it 'does not remove leading zeroes' do
+        expect(described_class.new(name: 'foo', minute: '0045')[:minute]).to eq(['0045'])
+      end
     end
 
     describe 'hour' do
@@ -193,6 +202,15 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', hour: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid hour})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :hour => '*/26' ) }.to raise_error(Puppet::Error, /is not a valid hour/)
+      end
+
+      it 'supports values with leading zeros' do
+        expect { described_class.new(name: 'foo', hour: ['007', '1', '0023']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', hour: '022') }.not_to raise_error
+      end
+
+      it 'does not remove leading zeroes' do
+        expect(described_class.new(name: 'foo', hour: '005')[:hour]).to eq(['005'])
       end
     end
 
@@ -276,6 +294,15 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', weekday: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid weekday})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :weekday => '*/9' ) }.to raise_error(Puppet::Error, /is not a valid weekday/)
+      end
+
+      it 'supports values with leading zeros' do
+        expect { described_class.new(name: 'foo', weekday: ['Mon', 'Wed', '05']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', weekday: '007') }.not_to raise_error
+      end
+
+      it 'does not remove leading zeroes' do
+        expect(described_class.new(name: 'foo', weekday: '006')[:weekday]).to eq(['006'])
       end
     end
 
@@ -376,6 +403,15 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :month => '*/13' ) }.to raise_error(Puppet::Error, /is not a valid month/)
       end
+
+      it 'supports values with leading zeros' do
+        expect { described_class.new(name: 'foo', month: ['007', '1', '0012']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', month: ['Jan', '04', '0009']) }.not_to raise_error
+      end
+
+      it 'does not remove leading zeroes' do
+        expect(described_class.new(name: 'foo', month: '09')[:month]).to eq(['09'])
+      end
     end
 
     describe 'monthday' do
@@ -440,6 +476,15 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', monthday: '*/2A') }.to raise_error(Puppet::Error, %r{\*/2A is not a valid monthday})
         # As it turns out cron does not complaining about steps that exceed the valid range
         # expect { described_class.new(:name => 'foo', :monthday => '*/32' ) }.to raise_error(Puppet::Error, /is not a valid monthday/)
+      end
+
+      it 'supports values with leading zeros' do
+        expect { described_class.new(name: 'foo', monthday: ['007', '1', '0023']) }.not_to raise_error
+        expect { described_class.new(name: 'foo', monthday: '022') }.not_to raise_error
+      end
+
+      it 'does not remove leading zeroes' do
+        expect(described_class.new(name: 'foo', monthday: '01')[:monthday]).to eq(['01'])
       end
     end
 
