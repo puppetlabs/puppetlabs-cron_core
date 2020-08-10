@@ -73,9 +73,7 @@ Puppet::Type.newtype(:cron) do
     # in string form to actual integers, and returns the value if it's
     # an integer or false if it's just a normal string.
     def numfix(num)
-      if num =~ %r{^\d+$}
-        num.to_i
-      elsif num.is_a?(Integer)
+      if num =~ %r{^\d+$} || num.is_a?(Integer)
         num
       else
         false
@@ -85,7 +83,7 @@ Puppet::Type.newtype(:cron) do
     # Verify that a number is within the specified limits.  Return the
     # number if it is, or false if it is not.
     def limitcheck(num, lower, upper)
-      (num >= lower && num <= upper) && num
+      (num.to_i >= lower && num.to_i <= upper) && num
     end
 
     # Verify that a value falls within the specified array.  Does case
