@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.0.5](https://github.com/puppetlabs/puppetlabs-cron_core/tree/1.0.5) (2020-10-30)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/1.0.4...1.0.5)
+
+### Fixed
+
+- \(MODULES-10852\) Fix warnings introduced by Ruby 2.7 [\#39](https://github.com/puppetlabs/puppetlabs-cron_core/pull/39) ([luchihoratiu](https://github.com/luchihoratiu))
+- \(MODULES-7786\) Allow leading zeroes for cron params [\#35](https://github.com/puppetlabs/puppetlabs-cron_core/pull/35) ([Dorin-Pleava](https://github.com/Dorin-Pleava))
+
 ## [1.0.4](https://github.com/puppetlabs/puppetlabs-cron_core/tree/1.0.4) (2020-05-06)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/1.0.3...1.0.4)
