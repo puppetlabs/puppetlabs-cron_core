@@ -17,59 +17,53 @@ describe Puppet::Provider::Cron::FileType do
     # make Puppet::Util::SUIDManager return something deterministic, not the
     # uid of the user running the tests, except where overridden below.
     before :each do
-      Puppet::Util::SUIDManager.stubs(:uid).returns 1234
+      allow(Puppet::Util::SUIDManager).to receive(:uid).and_return 1234
     end
 
     describe '#read' do
       before(:each) do
-        Puppet::Util.stubs(:uid).with(uid).returns 9000
+        allow(Puppet::Util).to receive(:uid).with(uid).and_return 9000
       end
 
       it 'runs crontab -l as the target user' do
-        Puppet::Util::Execution
-          .expects(:execute)
-          .with(['crontab', '-l'], user_options)
-          .returns(Puppet::Util::Execution::ProcessOutput.new(crontab, 0))
-
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-l'], user_options).and_return(Puppet::Util::Execution::ProcessOutput.new(crontab, 0))
         expect(cron.read).to eq(crontab)
       end
 
       it 'does not switch user if current user is the target user' do
-        Puppet::Util.expects(:uid).with(uid).twice.returns 9000
-        Puppet::Util::SUIDManager.expects(:uid).returns 9000
-        Puppet::Util::Execution
-          .expects(:execute).with(['crontab', '-l'], options)
-          .returns(Puppet::Util::Execution::ProcessOutput.new(crontab, 0))
+        expect(Puppet::Util).to receive(:uid).with(uid).twice.and_return 9000
+        expect(Puppet::Util::SUIDManager).to receive(:uid).and_return 9000
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-l'], options).and_return(Puppet::Util::Execution::ProcessOutput.new(crontab, 0))
         expect(cron.read).to eq(crontab)
       end
 
       it 'treats an absent crontab as empty' do
-        Puppet::Util::Execution.expects(:execute).with(['crontab', '-l'], user_options).raises(Puppet::ExecutionFailure, absent_crontab)
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-l'], user_options).and_raise(Puppet::ExecutionFailure, absent_crontab)
         expect(cron.read).to eq('')
       end
 
       it "treats a nonexistent user's crontab as empty" do
-        Puppet::Util.expects(:uid).with(uid).returns nil
+        expect(Puppet::Util).to receive(:uid).with(uid).and_return nil
 
         expect(cron.read).to eq('')
       end
 
       it 'returns empty if the user is not authorized to use cron' do
-        Puppet::Util::Execution.expects(:execute).with(['crontab', '-l'], user_options).raises(Puppet::ExecutionFailure, unauthorized_crontab)
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-l'], user_options).and_raise(Puppet::ExecutionFailure, unauthorized_crontab)
         expect(cron.read).to eq('')
       end
     end
 
     describe '#remove' do
       it 'runs crontab -r as the target user' do
-        Puppet::Util::Execution.expects(:execute).with(['crontab', '-r'], user_options)
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-r'], user_options)
         cron.remove
       end
 
       it 'does not switch user if current user is the target user' do
-        Puppet::Util.expects(:uid).with(uid).returns 9000
-        Puppet::Util::SUIDManager.expects(:uid).returns 9000
-        Puppet::Util::Execution.expects(:execute).with(['crontab', '-r'], options)
+        expect(Puppet::Util).to receive(:uid).with(uid).and_return 9000
+        expect(Puppet::Util::SUIDManager).to receive(:uid).and_return 9000
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-r'], options)
         cron.remove
       end
     end
@@ -79,30 +73,30 @@ describe Puppet::Provider::Cron::FileType do
       let!(:tmp_cron_path) { tmp_cron.path }
 
       before :each do
-        Puppet::Util.stubs(:uid).with(uid).returns 9000
-        Tempfile.expects(:new).with("puppet_#{name}", encoding: Encoding.default_external).returns tmp_cron
+        allow(Puppet::Util).to receive(:uid).with(uid).and_return 9000
+        allow(Tempfile).to receive(:new).with("puppet_#{name}", encoding: Encoding.default_external).and_return tmp_cron
       end
 
       after :each do
-        File.unstub(:chown)
+        allow(File).to receive(:chown).and_call_original
       end
 
       it 'runs crontab as the target user on a temporary file' do
-        File.expects(:chown).with(9000, nil, tmp_cron_path)
-        Puppet::Util::Execution.expects(:execute).with(['crontab', tmp_cron_path], user_options)
+        expect(File).to receive(:chown).with(9000, nil, tmp_cron_path)
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', tmp_cron_path], user_options)
 
-        tmp_cron.expects(:print).with("foo\n")
+        expect(tmp_cron).to receive(:print).with("foo\n")
         cron.write "foo\n"
 
         expect(Puppet::FileSystem).not_to exist(tmp_cron_path)
       end
 
       it 'does not switch user if current user is the target user' do
-        Puppet::Util::SUIDManager.expects(:uid).returns 9000
-        File.expects(:chown).with(9000, nil, tmp_cron_path)
-        Puppet::Util::Execution.expects(:execute).with(['crontab', tmp_cron_path], options)
+        expect(Puppet::Util::SUIDManager).to receive(:uid).and_return 9000
+        expect(File).to receive(:chown).with(9000, nil, tmp_cron_path)
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', tmp_cron_path], options)
 
-        tmp_cron.expects(:print).with("foo\n")
+        expect(tmp_cron).to receive(:print).with("foo\n")
         cron.write "foo\n"
 
         expect(Puppet::FileSystem).not_to exist(tmp_cron_path)

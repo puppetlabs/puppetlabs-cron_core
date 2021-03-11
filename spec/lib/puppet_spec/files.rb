@@ -10,7 +10,7 @@ module PuppetSpec::Files
     $global_tempfiles ||= []
     $global_tempfiles.each do |path|
       begin
-        Dir.unstub(:entries)
+        allow(Dir).to receive(:entries).and_call_original
         FileUtils.rm_rf path, secure: true
       rescue Errno::ENOENT # rubocop:disable Lint/HandleExceptions
         # nothing to do
