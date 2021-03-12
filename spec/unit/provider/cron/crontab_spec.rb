@@ -125,7 +125,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
     let(:resources) { { 'test' => resource } }
 
     before :each do
-      subject.stubs(:prefetch_all_targets).returns([record])
+      allow(subject).to receive(:prefetch_all_targets).and_return([record])
     end
 
     # this would be a more fitting test, but I haven't yet
@@ -141,17 +141,17 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
     #    end
 
     it "does not base the new resource's provider on the existing record" do
-      subject.expects(:new).with(record).never
-      subject.stubs(:new)
+      expect(subject).not_to receive(:new).with(record)
+      allow(subject).to receive(:new)
       subject.prefetch(resources)
     end
   end
 
   context 'when prefetching an entry now managed for another user' do
     let(:resource) do
-      s = stub(:resource)
-      s.stubs(:[]).with(:user).returns 'root'
-      s.stubs(:[]).with(:target).returns 'root'
+      s = instance_double('Puppet::Type::Crontab')
+      allow(s).to receive(:[]).with(:user).and_return 'root'
+      allow(s).to receive(:[]).with(:target).and_return 'root'
       s
     end
 
@@ -159,16 +159,16 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
     let(:resources) { { 'test' => resource } }
 
     before :each do
-      subject.stubs(:prefetch_all_targets).returns([record])
+      allow(subject).to receive(:prefetch_all_targets).and_return([record])
     end
 
     it 'tries and use the match method to find a more fitting record' do
-      subject.expects(:match).with(record, resources)
+      expect(subject).to receive(:match).with(record, resources)
       subject.prefetch(resources)
     end
 
     it 'does not match a provider to the resource' do
-      resource.expects(:provider=).never
+      expect(resource).not_to receive(:provider=)
       subject.prefetch(resources)
     end
 
@@ -205,19 +205,17 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
 
   context '#enumerate_crontabs' do
     before(:each) do
-      File.expects(:readable?).with(subject.crontab_dir).returns(true)
-      Dir.expects(:foreach).with(subject.crontab_dir).multiple_yields(*files)
+      allow(File).to receive(:readable?).with(subject.crontab_dir).and_return(true)
     end
 
     context 'only a hidden file' do
-      let(:files) { ['.keep_cronbase-0'] }
+      let(:file) { '.keep_cronbase-0' }
 
       before(:each) do
-        files.each do |filename|
-          path = File.join(subject.crontab_dir, filename)
-          File.expects(:file?).with(path).returns(true)
-          File.expects(:writable?).with(path).returns(true)
-        end
+        path = File.join(subject.crontab_dir, file)
+        allow(Dir).to receive(:foreach).with(subject.crontab_dir).and_yield(file)
+        allow(File).to receive(:file?).with(path).and_return(true)
+        allow(File).to receive(:writable?).with(path).and_return(true)
       end
 
       it 'ignores .keep_* files' do
@@ -229,10 +227,12 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       let(:files) { ['myuser', '.keep_cronbase-0'] }
 
       before(:each) do
+        allow(Dir).to receive(:foreach).with(subject.crontab_dir).and_yield(files[0]).and_yield(files[1])
+
         files.each do |filename|
           path = File.join(subject.crontab_dir, filename)
-          File.expects(:file?).with(path).returns(true)
-          File.expects(:writable?).with(path).returns(true)
+          allow(File).to receive(:file?).with(path).and_return(true)
+          allow(File).to receive(:writable?).with(path).and_return(true)
         end
       end
 
