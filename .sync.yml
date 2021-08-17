@@ -11,11 +11,13 @@ Gemfile:
     ':system_tests':
       - gem: 'puppet-module-posix-system-r#{minor_version}'
         platforms: ruby
+        version: '~> 1.0'
       - gem: 'puppet-module-win-system-r#{minor_version}'
         platforms:
           - mswin
           - mingw
           - x64_mingw
+        version: '~> 1.0'
       - gem: beaker
         version: '~> 3.34'
         from_env: BEAKER_VERSION
