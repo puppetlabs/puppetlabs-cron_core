@@ -37,11 +37,11 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
     samples = YAML.load(File.read(my_fixture('single_line.yaml'))) # rubocop:disable Security/YAMLLoad
 
     samples.each do |name, data|
-      it "should parse crontab line #{name} correctly" do
+      it "parses crontab line #{name} correctly" do
         compare_crontab_record subject.parse_line(data[:text]), data[:record]
       end
 
-      it "should reconstruct the crontab line #{name} from the record" do
+      it "reconstructs the crontab line #{name} from the record" do
         expect(subject.to_line(data[:record])).to eq(data[:text])
       end
     end

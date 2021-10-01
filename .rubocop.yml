@@ -20,7 +20,7 @@ AllCops:
   - "**/Guardfile"
 Layout/LineLength:
   Description: People have wide screens, use them.
-  Enabled: false
+  Max: 260
 RSpec/BeforeAfterAll:
   Description: Beware of using after(:all) as it may cause state to leak between tests.
     A necessary evil in acceptance testing.
@@ -72,6 +72,8 @@ Style/SymbolArray:
   Description: Using percent style obscures symbolic intent of array's contents.
   EnforcedStyle: brackets
 RSpec/NamedSubject:
+  Enabled: false
+RSpec/SubjectStub:
   Enabled: false
 RSpec/MessageSpies:
   EnforcedStyle: receive
@@ -134,8 +136,6 @@ Layout/EmptyComment:
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Layout/EmptyLinesAroundArguments:
-  Enabled: false
-Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: false
@@ -285,8 +285,6 @@ Performance/DeleteSuffix:
   Enabled: false
 Performance/InefficientHashSearch:
   Enabled: false
-Performance/RegexpMatch:
-  Enabled: false
 Performance/UnfreezeString:
   Enabled: false
 Performance/UriDefaultParser:
@@ -316,8 +314,6 @@ RSpec/EmptyLineAfterHook:
 RSpec/ExampleLength:
   Enabled: false
 RSpec/ExampleWithoutDescription:
-  Enabled: false
-RSpec/ExampleWording:
   Enabled: false
 RSpec/ExpectChange:
   Enabled: false
@@ -366,8 +362,6 @@ RSpec/ReturnFromStub:
 RSpec/SharedExamples:
   Enabled: false
 RSpec/StubbedMock:
-  Enabled: false
-RSpec/SubjectStub:
   Enabled: false
 RSpec/UnspecifiedException:
   Enabled: false
@@ -463,15 +457,11 @@ Style/RedundantRegexpCharacterClass:
   Enabled: false
 Style/RedundantRegexpEscape:
   Enabled: false
-Style/RedundantReturn:
-  Enabled: false
 Style/RedundantSelfAssignment:
   Enabled: false
 Style/RedundantSort:
   Enabled: false
 Style/RescueStandardError:
-  Enabled: false
-Style/SafeNavigation:
   Enabled: false
 Style/SingleArgumentDig:
   Enabled: false

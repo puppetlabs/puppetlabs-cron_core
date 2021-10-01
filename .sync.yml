@@ -1,29 +1,21 @@
 ---
 .rubocop.yml:
   default_configs:
-    Metrics/LineLength:
+    Layout/LineLength:
       Max: 260
     RSpec/NamedSubject:
       Enabled: false
-
+    RSpec/SubjectStub:
+      Enabled: false
 Gemfile:
-  required:
-    ':system_tests':
-      - gem: 'puppet-module-posix-system-r#{minor_version}'
-        platforms: ruby
-        version: '~> 1.0'
-      - gem: 'puppet-module-win-system-r#{minor_version}'
-        platforms:
-          - mswin
-          - mingw
-          - x64_mingw
-        version: '~> 1.0'
+  optional:
+    ":development":
       - gem: beaker
-        version: '~> 3.34'
+        version: '~> 4.30'
         from_env: BEAKER_VERSION
       - gem: beaker-abs
         from_env: BEAKER_ABS_VERSION
-        version: '~> 0.5'
+        version: '~> 0.9'
       - gem: beaker-pe
       - gem: beaker-hostgenerator
         from_env: BEAKER_HOSTGENERATOR_VERSION
@@ -31,24 +23,19 @@ Gemfile:
         from_env: BEAKER_RSPEC_VERSION
       - gem: beaker-puppet
         from_env: BEAKER_PUPPET_VERSION
-        version: '~> 0.14'
-  optional:
-    ':development':
-      - gem: 'github_changelog_generator'
-        git: 'https://github.com/skywinder/github-changelog-generator'
-        ref: '20ee04ba1234e9e83eb2ffb5056e23d641c7a018'
-        condition: "Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')"
-
-.gitlab-ci.yml:
-  delete: true
+        version: '~> 1.22'
+      - gem: github_changelog_generator
+      - gem: beaker-module_install_helper
+      - gem: beaker-puppet_install_helper
+      - gem: nokogiri
 
 appveyor.yml:
   delete: true
-
 .travis.yml:
-  remove_includes:
-    - env: PUPPET_GEM_VERSION="~> 4.0" CHECK=parallel_spec
-      rvm: 2.1.9
-
-Rakefile:
-  changelog_version_tag_pattern: '%s'
+  delete: true
+.github/workflows/auto_release.yml:
+  unmanaged: false
+.github/workflows/release.yml:
+  unmanaged: false
+.gitlab-ci.yml:
+  delete: true

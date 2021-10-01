@@ -81,7 +81,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
   # I'd use expect(ENV).to receive(:[]).with('USER') but this does not work because
   # ENV["USER"] is evaluated at load time.
   describe 'when determining the default target' do
-    it "should use the current user #{ENV['USER']}", if: ENV['USER'] do
+    it "uses the current user #{ENV['USER']}", if: ENV['USER'] do
       expect(described_class.default_target).to eq(ENV['USER'])
     end
 
@@ -166,7 +166,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
 
     describe 'it should support special strings' do
       ['reboot', 'yearly', 'anually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'].each do |special|
-        it "should support @#{special}" do
+        it "supports @#{special}" do
           expect(described_class.parse_line("@#{special} /bin/true")).to eq(record_type: :crontab,
                                                                             hour: :absent,
                                                                             minute: :absent,
@@ -300,7 +300,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
         command: '/bin/false',
         target: 'nobody',
       }.each_pair do |field, new_value|
-        it "should not match a record when #{field} does not match" do
+        it "does not match a record when #{field} does not match" do
           record[field] = new_value
           expect(described_class.match(record, resource[:name] => resource)).to be_falsey
         end
@@ -317,7 +317,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
         command: '/bin/false',
         target: 'root',
       }.each_pair do |field, new_value|
-        it "should not match a record when #{field} does not match" do
+        it "does not match a record when #{field} does not match" do
           record_special[field] = new_value
           expect(described_class.match(record_special, resource_special[:name] => resource_special)).to be_falsey
         end

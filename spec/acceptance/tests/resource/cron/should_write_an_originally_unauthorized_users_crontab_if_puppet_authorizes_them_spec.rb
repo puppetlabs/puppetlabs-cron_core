@@ -61,7 +61,7 @@ RSpec.context 'when Puppet authorizes a previously unauthorized user to use cron
   compatible_agents.each do |agent|
     is_aix_or_solaris_agent = agent['platform'].include?('aix') || agent['platform'].include?('solaris')
 
-    it "should write that user's crontab on #{agent}", if: is_aix_or_solaris_agent do
+    it "writes that user's crontab on #{agent}", if: is_aix_or_solaris_agent do
       step 'Add the unauthorized user to the cron.deny file' do
         on(agent, "echo #{unauthorized_username} >> #{cron_deny_path[agent]}")
       end
