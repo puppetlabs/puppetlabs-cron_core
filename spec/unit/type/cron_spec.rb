@@ -21,19 +21,19 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
 
   describe 'when validating attributes' do
     [:name, :provider].each do |param|
-      it "should have a #{param} parameter" do
+      it "has a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
     [:command, :special, :minute, :hour, :weekday, :month, :monthday, :environment, :user, :target].each do |property|
-      it "should have a #{property} property" do
+      it "has a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
     end
 
     [:command, :minute, :hour, :weekday, :month, :monthday].each do |cronparam|
-      it "should have #{cronparam} of type CronParam" do
+      it "has #{cronparam} of type CronParam" do
         expect(described_class.attrclass(cronparam).ancestors).to include CronParam
       end
     end
@@ -490,7 +490,7 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
 
     describe 'special' do
       ['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'].each do |value|
-        it "should support the value '#{value}'" do
+        it "supports the value '#{value}'" do
           expect { described_class.new(name: 'foo', special: value) }.not_to raise_error
         end
       end
@@ -498,7 +498,7 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
       context 'when combined with numeric schedule fields' do
         context "which are 'absent'" do
           [['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'], :absent].flatten.each do |value|
-            it "should accept the value '#{value}' for special" do
+            it "accepts the value '#{value}' for special" do
               expect {
                 described_class.new(name: 'foo', minute: :absent, special: value)
               }.not_to raise_error
@@ -507,7 +507,7 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         end
         context 'which are not absent' do
           ['reboot', 'yearly', 'annually', 'monthly', 'weekly', 'daily', 'midnight', 'hourly'].each do |value|
-            it "should not accept the value '#{value}' for special" do
+            it "does not accept the value '#{value}' for special" do
               expect {
                 described_class.new(name: 'foo', minute: '1', special: value)
               }.to raise_error(Puppet::Error, %r{cannot specify both a special schedule and a value})

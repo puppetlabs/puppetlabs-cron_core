@@ -42,7 +42,7 @@ RSpec.context 'when Puppet cannot read a crontab file' do
   end
 
   compatible_agents.each do |agent|
-    it "should only fail the associated resources on #{agent}" do
+    it "onlies fail the associated resources on #{agent}" do
       if older_agent?(agent)
         skip('Skipping this test since we are on an older agent that does not have the PUP-9217 changes')
       end

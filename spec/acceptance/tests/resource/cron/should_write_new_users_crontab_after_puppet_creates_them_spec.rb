@@ -31,7 +31,7 @@ RSpec.context 'when Puppet creates a user in the middle of its run' do
   end
 
   compatible_agents.each do |agent|
-    it "should be able to write their crontab on #{agent}" do
+    it "is able to write their crontab on #{agent}" do
       puppet_result = nil
       step "Create the new user, and the known + new user's crontab entries with Puppet" do
         # Placing Cron[first_entry] before creating the new user
