@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-cron_core",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "author": "puppetlabs",
   "summary": "Install and manage cron resources.",
   "license": "Apache-2.0",
