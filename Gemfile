@@ -31,6 +31,8 @@ group :development do
   gem "beaker-rspec"
   gem "beaker-puppet", *location_for(ENV['BEAKER_PUPPET_VERSION'] || '~> 1.22')
   gem "github_changelog_generator",                                              require: false
+  # We can unpin async when we move to Ruby 3
+  gem 'async', '~> 1'
   gem "beaker-module_install_helper",                                            require: false
   gem "beaker-puppet_install_helper",                                            require: false
   gem "nokogiri",                                                                require: false
