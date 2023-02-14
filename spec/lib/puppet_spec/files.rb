@@ -9,12 +9,10 @@ module PuppetSpec::Files
     # rubocop:disable Style/GlobalVars
     $global_tempfiles ||= []
     $global_tempfiles.each do |path|
-      begin
-        allow(Dir).to receive(:entries).and_call_original
-        FileUtils.rm_rf path, secure: true
-      rescue Errno::ENOENT
-        # nothing to do
-      end
+      allow(Dir).to receive(:entries).and_call_original
+      FileUtils.rm_rf path, secure: true
+    rescue Errno::ENOENT
+      # nothing to do
     end
     $global_tempfiles = []
     # rubocop:enable Style/GlobalVars
