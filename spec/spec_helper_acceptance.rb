@@ -51,7 +51,7 @@ end
 def setup(agent, o = {})
   o = { user: 'tstuser' }.merge(o)
   apply_manifest_on(agent, %(user { '%s': ensure => present, managehome => false }) % o[:user])
-  apply_manifest_on(agent, %(case $operatingsystem {
+  apply_manifest_on(agent, %(case $facts['os']['name'] {
                                 centos, redhat, fedora: {$cron = 'cronie'}
                                 solaris: { $cron = 'core-os' }
                                 default: {$cron ='cron'} }
