@@ -13,4 +13,4 @@ jobs:
     uses: "puppetlabs/phoenix-github-actions/.github/workflows/unit_tests_with_nightly_puppet_gem.yaml@main"
   
   Released:
-    uses: "puppetlabs/phoenix-github-actions/.github/workflows/unit_tests_with_released_puppet_gem.yaml@main"
+    uses: "mhashizume/phoenix-github-actions/.github/workflows/unit_tests_with_released_puppet_gem.yaml@b976f70ceaa6c7d38d38237b5d360a4eed16692f"
