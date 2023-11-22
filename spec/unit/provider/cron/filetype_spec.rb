@@ -6,6 +6,7 @@ describe Puppet::Provider::Cron::FileType do
   shared_examples_for 'crontab provider' do
     let(:cron)         { type.new('no_such_user') }
     let(:crontab)      { File.read(my_fixture(crontab_output)) }
+    let(:managedtab)   { File.read(my_fixture('managed_output')) }
     let(:options)      { { failonfail: true, combine: true } }
     let(:uid)          { 'no_such_user' }
     let(:user_options) { options.merge(uid: uid) }
@@ -28,6 +29,11 @@ describe Puppet::Provider::Cron::FileType do
       it 'runs crontab -l as the target user' do
         expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-l'], user_options).and_return(Puppet::Util::Execution::ProcessOutput.new(crontab, 0))
         expect(cron.read).to eq(crontab)
+      end
+
+      it 'returns a String' do
+        expect(Puppet::Util::Execution).to receive(:execute).with(['crontab', '-l'], user_options).and_return(Puppet::Util::Execution::ProcessOutput.new(managedtab, 0))
+        expect(cron.read).to be_an_instance_of(String)
       end
 
       it 'does not switch user if current user is the target user' do
