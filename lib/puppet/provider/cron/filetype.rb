@@ -1,6 +1,6 @@
 require 'puppet/util/filetype'
 
-class Puppet::Provider::Cron
+class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
   # This class defines the crontab filetypes
   class FileType < Puppet::Util::FileType
     class << self
@@ -26,7 +26,7 @@ class Puppet::Provider::Cron
     # implementation in the future. This way, we can refactor all three of
     # our cron file types into a common crontab file type.
     newfiletype(:crontab) do
-      def initialize(user) # rubocop:disable Lint/MissingSuper
+      def initialize(user)
         self.path = user
       end
 
