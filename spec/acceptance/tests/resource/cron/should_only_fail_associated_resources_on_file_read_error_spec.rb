@@ -100,7 +100,7 @@ SCRIPT
       end
 
       step 'Verify that Puppet does not fail a Cron resource associated with a readable crontab file' do
-        assert_no_match(%r{Cron.*first_entry}, puppet_result.stderr, 'Puppet fails a Cron resource associated with a readable crontab file')
+        refute_match(%r{Cron.*first_entry}, puppet_result.stderr, 'Puppet fails a Cron resource associated with a readable crontab file')
       end
 
       step 'Verify that Puppet successfully evaluates a Cron resource associated with a readable crontab file' do
