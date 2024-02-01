@@ -18,13 +18,13 @@ RSpec.context 'when creating cron' do
   compatible_agents.each do |host|
     it 'creates a new cron job' do
       step 'apply the resource on the host using puppet resource'
-      on(host, puppet_resource('cron', 'crontest', 'user=tstuser', 'command=/bin/true', 'ensure=present')) do
-        expect(stdout).to match(%r{created})
+      on(host, puppet_resource('cron', 'crontest', 'user=tstuser', 'command=/bin/true', 'ensure=present')) do |result|
+        expect(result.stdout).to match(%r{created})
       end
 
       step 'verify that crontab -l contains what you expected'
-      run_cron_on(host, :list, 'tstuser') do
-        expect(stdout).to match(%r{\* \* \* \* \* /bin/true})
+      run_cron_on(host, :list, 'tstuser') do |result|
+        expect(result.stdout).to match(%r{\* \* \* \* \* /bin/true})
       end
     end
   end
