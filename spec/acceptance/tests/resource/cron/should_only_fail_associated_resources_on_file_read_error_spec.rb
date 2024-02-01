@@ -1,26 +1,11 @@
 require 'spec_helper_acceptance'
 
 RSpec.context 'when Puppet cannot read a crontab file' do
-  # This test only makes sense for agents that shipped with PUP-9217's
-  # changes, so we do not want to run it on older agents.
-  def older_agent?(agent)
-    puppet_version = Gem::Version.new(on(agent, puppet('--version')).stdout.chomp)
-    minimum_puppet_version = if puppet_version < Gem::Version.new('6.0.0')
-                               Gem::Version.new('5.5.9')
-                             else
-                               Gem::Version.new('6.0.5')
-                             end
-
-    puppet_version < minimum_puppet_version
-  end
-
   let(:username) { "pl#{rand(999_999).to_i}" }
   let(:failed_username) { "pl#{rand(999_999).to_i}" }
 
   before(:each) do
     compatible_agents.each do |agent|
-      next if older_agent?(agent)
-
       step "Create the users on #{agent}" do
         user_present(agent, username)
         user_present(agent, failed_username)
@@ -30,8 +15,6 @@ RSpec.context 'when Puppet cannot read a crontab file' do
 
   after(:each) do
     compatible_agents.each do |agent|
-      next if older_agent?(agent)
-
       step "Teardown -- Erase the users on #{agent}" do
         run_cron_on(agent, :remove, username)
         user_absent(agent, username)
@@ -43,10 +26,6 @@ RSpec.context 'when Puppet cannot read a crontab file' do
 
   compatible_agents.each do |agent|
     it "onlies fail the associated resources on #{agent}" do
-      if older_agent?(agent)
-        skip('Skipping this test since we are on an older agent that does not have the PUP-9217 changes')
-      end
-
       crontab_exe = nil
       step 'Find the crontab executable' do
         crontab_exe = on(agent, 'which crontab').stdout.chomp
