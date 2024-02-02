@@ -22,8 +22,8 @@ RSpec.context 'when leading zeroes are present' do
       end
 
       step 'Verify that crontab -l contains what you expected' do
-        run_cron_on(host, :list, 'tstuser') do
-          expect(stdout).to match(%r{05 007 07 0011 03 /bin/true})
+        run_cron_on(host, :list, 'tstuser') do |result|
+          expect(result.stdout).to match(%r{05 007 07 0011 03 /bin/true})
         end
       end
     end

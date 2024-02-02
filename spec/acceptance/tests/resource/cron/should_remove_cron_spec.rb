@@ -22,13 +22,13 @@ RSpec.context 'when removing crontab' do
 
       step 'apply the resource on the host using puppet resource'
       on(host, puppet_resource('cron', 'crontest', 'user=tstuser',
-                               'command=/bin/true', 'ensure=absent')) do
-        expect(stdout).to match(%r{crontest\D+ensure:\s+removed})
+                               'command=/bin/true', 'ensure=absent')) do |result|
+        expect(result.stdout).to match(%r{crontest\D+ensure:\s+removed})
       end
 
       step ' contains what you expected'
-      run_cron_on(host, :list, 'tstuser') do
-        expect(stderr).not_to match(%r{/bin/true})
+      run_cron_on(host, :list, 'tstuser') do |result|
+        expect(result.stderr).not_to match(%r{/bin/true})
       end
     end
   end

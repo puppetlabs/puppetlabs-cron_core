@@ -21,13 +21,13 @@ RSpec.context 'when removing crontabs' do
   compatible_agents.each do |host|
     it 'removes crontabs based on matching' do
       step 'Remove cron resource'
-      on(host, puppet_resource('cron', 'bogus', 'user=tstuser', 'command=/bin/true', 'ensure=absent')) do
-        expect(stdout).to match(%r{bogus\D+ensure: removed})
+      on(host, puppet_resource('cron', 'bogus', 'user=tstuser', 'command=/bin/true', 'ensure=absent')) do |result|
+        expect(result.stdout).to match(%r{bogus\D+ensure: removed})
       end
 
       step 'verify that crontab -l contains what you expected'
-      run_cron_on(host, :list, 'tstuser') do
-        expect(stdout.scan('/bin/true').length).to eq(0)
+      run_cron_on(host, :list, 'tstuser') do |result|
+        expect(result.stdout.scan('/bin/true').length).to eq(0)
       end
     end
   end
