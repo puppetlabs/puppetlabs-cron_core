@@ -38,7 +38,6 @@ group :development do
   gem "rb-readline", '= 0.5.5',                                                 require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "beaker", *location_for(ENV['BEAKER_VERSION'] || '~> 4.30')
   gem "beaker-abs", *location_for(ENV['BEAKER_ABS_VERSION'] || '~> 0.9')
-  gem "beaker-pe",                                                              require: false
   gem "beaker-hostgenerator"
   gem "beaker-rspec"
   gem "beaker-puppet", *location_for(ENV['BEAKER_PUPPET_VERSION'] || '~> 1.22')

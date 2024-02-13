@@ -16,7 +16,6 @@ Gemfile:
       - gem: beaker-abs
         from_env: BEAKER_ABS_VERSION
         version: '~> 0.9'
-      - gem: beaker-pe
       - gem: beaker-hostgenerator
         from_env: BEAKER_HOSTGENERATOR_VERSION
       - gem: beaker-rspec
