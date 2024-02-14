@@ -13,7 +13,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
   text_line :environment, match: %r{^\s*\w+\s*=}
 
   def self.filetype
-    tabname = case Facter.value(:osfamily)
+    tabname = case Facter.value('os.family')
               when 'Solaris'
                 :suntab
               when 'AIX'
@@ -261,7 +261,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
     @property_hash[:user] || @property_hash[:target]
   end
 
-  CRONTAB_DIR = case Facter.value('osfamily')
+  CRONTAB_DIR = case Facter.value('os.family')
                 when 'Debian', 'HP-UX', 'Solaris'
                   '/var/spool/cron/crontabs'
                 when %r{BSD}

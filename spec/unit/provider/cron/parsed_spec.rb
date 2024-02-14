@@ -63,17 +63,17 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
 
   describe 'when determining the correct filetype' do
     it 'uses the suntab filetype on Solaris' do
-      allow(Facter).to receive(:value).with(:osfamily).and_return 'Solaris'
+      allow(Facter).to receive(:value).with('os.family').and_return 'Solaris'
       expect(described_class.filetype).to eq(Puppet::Provider::Cron::FileType::FileTypeSuntab)
     end
 
     it 'uses the aixtab filetype on AIX' do
-      allow(Facter).to receive(:value).with(:osfamily).and_return 'AIX'
+      allow(Facter).to receive(:value).with('os.family').and_return 'AIX'
       expect(described_class.filetype).to eq(Puppet::Provider::Cron::FileType::FileTypeAixtab)
     end
 
     it 'uses the crontab filetype on other platforms' do
-      allow(Facter).to receive(:value).with(:osfamily).and_return 'Not a real operating system family'
+      allow(Facter).to receive(:value).with('os.family').and_return 'Not a real operating system family'
       expect(described_class.filetype).to eq(Puppet::Provider::Cron::FileType::FileTypeCrontab)
     end
   end
@@ -187,8 +187,8 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
 
     describe 'on linux' do
       before(:each) do
-        allow(Facter).to receive(:value).with(:osfamily).and_return 'Linux'
-        allow(Facter).to receive(:value).with(:operatingsystem)
+        allow(Facter).to receive(:value).with('os.family').and_return 'Linux'
+        allow(Facter).to receive(:value).with('os.name')
       end
 
       it 'contains no resources for a user who has no crontab' do
