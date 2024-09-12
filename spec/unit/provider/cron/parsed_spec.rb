@@ -223,7 +223,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
         expect(parameters[0][:special]).to eq(:absent)
         expect(parameters[0][:command]).to match(%r{\$HOME/bin/daily.job >> \$HOME/tmp/out 2>&1})
         expect(parameters[0][:ensure]).to eq(:present)
-        expect(parameters[0][:environment]).to eq(:absent)
+        expect(parameters[0][:environment]).to eq([])
         expect(parameters[0][:user]).to eq(:absent)
 
         expect(parameters[1][:name]).to match(%r{unmanaged:\$HOME/bin/monthly-\d+})
@@ -235,7 +235,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
         expect(parameters[1][:special]).to eq(:absent)
         expect(parameters[1][:command]).to match(%r{\$HOME/bin/monthly})
         expect(parameters[1][:ensure]).to eq(:present)
-        expect(parameters[1][:environment]).to eq(:absent)
+        expect(parameters[1][:environment]).to eq([])
         expect(parameters[1][:user]).to eq(:absent)
         expect(parameters[1][:target]).to eq('foobar')
       end
@@ -259,7 +259,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
                        special: :absent,
                        command: '/bin/true',
                        ensure: :present,
-                       environment: :absent,
+                       environment: [],
                        user: :absent,
                        target: 'foobar',
                      },
