@@ -18,14 +18,14 @@ RSpec.context 'when checking idempotency' do
   compatible_agents.each do |agent|
     it "ensures idempotency on #{agent}" do
       step 'Cron: basic - verify that it can be created'
-      result = apply_manifest_on(agent, 'cron { "myjob": command => "/bin/true", user    => "tstuser", hour    => "*", minute  => [1], ensure  => present,}')
+      result = apply_manifest_on(agent, 'cron { "myjob": command => "/bin/true", user    => "tstuser", hour    => "*", minute  => [1], ensure  => present, environment => [],}')
       expect(result.stdout).to match(%r{ensure: created})
 
       result = run_cron_on(agent, :list, 'tstuser')
       expect(result.stdout).to match(%r{. . . . . .bin.true})
 
       step 'Cron: basic - should not create again'
-      result = apply_manifest_on(agent, 'cron { "myjob": command => "/bin/true", user    => "tstuser", hour    => "*", minute  => [1], ensure  => present,}')
+      result = apply_manifest_on(agent, 'cron { "myjob": command => "/bin/true", user    => "tstuser", hour    => "*", minute  => [1], ensure  => present, environment => [],}')
       expect(result.stdout).not_to match(%r{ensure: created})
     end
   end
