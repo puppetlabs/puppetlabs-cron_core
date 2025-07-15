@@ -14,3 +14,4 @@ jobs:
   
   Released:
     uses: "puppetlabs/phoenix-github-actions/.github/workflows/unit_tests_with_released_puppet_gem.yaml@main"
+    secrets: inherit
