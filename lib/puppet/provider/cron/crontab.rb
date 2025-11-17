@@ -221,7 +221,7 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
           record[:unmanaged] = true
         end
         if envs.nil? || envs.empty?
-          record[:environment] = :absent
+          record[:environment] = []
         else
           # Collect all of the environment lines, and mark the records to be skipped,
           # since their data is included in our crontab record.
