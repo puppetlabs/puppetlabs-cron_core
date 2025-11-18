@@ -15,7 +15,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       name: 'basic',
       command: '/bin/true',
       target: 'root',
-      provider: provider,
+      provider:,
     )
   end
 
@@ -173,7 +173,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
                                                                             month: :absent,
                                                                             weekday: :absent,
                                                                             monthday: :absent,
-                                                                            special: special,
+                                                                            special:,
                                                                             command: '/bin/true')
         end
       end

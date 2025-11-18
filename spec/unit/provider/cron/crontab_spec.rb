@@ -34,7 +34,7 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
 
     ########################################################################
     # Simple input fixtures for testing.
-    samples = YAML.load(File.read(my_fixture('single_line.yaml'))) # rubocop:disable Security/YAMLLoad
+    samples = YAML.load(File.read(my_fixture('single_line.yaml')))
 
     samples.each do |name, data|
       it "parses crontab line #{name} correctly" do
