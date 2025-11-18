@@ -186,7 +186,7 @@ Puppet::Type.newtype(:cron) do
         retval = alphacheck(value, alpha)
       end
 
-      raise _('%{value} is not a valid %{name}') % { value: value, name: self.class.name } unless retval
+      raise _('%{value} is not a valid %{name}') % { value:, name: self.class.name } unless retval
       return retval.to_s if retval
     end
   end
@@ -417,7 +417,7 @@ Puppet::Type.newtype(:cron) do
     [:minute, :hour, :weekday, :monthday, :month].each do |field|
       next unless self[field]
       next if self[field] == :absent
-      raise ArgumentError, _('%{cron} cannot specify both a special schedule and a value for %{field}') % { cron: ref, field: field }
+      raise ArgumentError, _('%{cron} cannot specify both a special schedule and a value for %{field}') % ({ cron: ref, field: })
     end
   end
 

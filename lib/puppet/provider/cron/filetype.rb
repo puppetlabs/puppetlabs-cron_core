@@ -34,7 +34,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
         begin
           @uid = Puppet::Util.uid(user)
         rescue Puppet::Error => detail
-          raise FileReadError, _('Could not retrieve user %{user}: %{detail}') % { user: user, detail: detail }, detail.backtrace
+          raise FileReadError, _('Could not retrieve user %{user}: %{detail}') % ({ user:, detail: }), detail.backtrace
         end
 
         # XXX We have to have the user name, not the uid, because some
@@ -60,7 +60,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
 
           ''
         else
-          raise FileReadError, _('Could not read crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+          raise FileReadError, _('Could not read crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
         end
       end
 
@@ -123,7 +123,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
 
           ''
         else
-          raise FileReadError, _('Could not read crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+          raise FileReadError, _('Could not read crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
         end
       end
 
@@ -131,7 +131,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
       def remove
         Puppet::Util::Execution.execute(['crontab', '-r'], cronargs).to_s
       rescue => detail
-        raise FileReadError, _('Could not remove crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+        raise FileReadError, _('Could not remove crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
       end
 
       # Overwrite a specific @path's cron tab; must be passed the @path name
@@ -146,7 +146,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
           File.chown(Puppet::Util.uid(@path), nil, output_file.path)
           Puppet::Util::Execution.execute(['crontab', output_file.path], cronargs).to_s
         rescue => detail
-          raise FileReadError, _('Could not write crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+          raise FileReadError, _('Could not write crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
         ensure
           output_file.close
           output_file.unlink
@@ -174,7 +174,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
 
           ''
         else
-          raise FileReadError, _('Could not read crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+          raise FileReadError, _('Could not read crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
         end
       end
 
@@ -182,7 +182,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
       def remove
         Puppet::Util::Execution.execute(['crontab', '-r'], cronargs).to_s
       rescue => detail
-        raise FileReadError, _('Could not remove crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+        raise FileReadError, _('Could not remove crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
       end
 
       # Overwrite a specific @path's cron tab; must be passed the @path name
@@ -198,7 +198,7 @@ class Puppet::Provider::Cron # rubocop:disable Style/ClassAndModuleChildren
           File.chown(Puppet::Util.uid(@path), nil, output_file.path)
           Puppet::Util::Execution.execute(['crontab', output_file.path], cronargs).to_s
         rescue => detail
-          raise FileReadError, _('Could not write crontab for %{path}: %{detail}') % { path: @path, detail: detail }, detail.backtrace
+          raise FileReadError, _('Could not write crontab for %{path}: %{detail}') % ({ path: @path, detail: }), detail.backtrace
         ensure
           output_file.close
           output_file.unlink

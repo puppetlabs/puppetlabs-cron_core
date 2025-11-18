@@ -9,7 +9,7 @@ describe Puppet::Provider::Cron::FileType do
     let(:managedtab)   { File.read(my_fixture('managed_output')) }
     let(:options)      { { failonfail: true, combine: true } }
     let(:uid)          { 'no_such_user' }
-    let(:user_options) { options.merge(uid: uid) }
+    let(:user_options) { options.merge(uid:) }
 
     it 'exists' do
       expect(type).not_to be_nil
