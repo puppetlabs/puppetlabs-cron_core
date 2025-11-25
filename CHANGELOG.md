@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.0.0](https://github.com/puppetlabs/puppetlabs-cron_core/tree/v2.0.0) - 2025-11-25
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/v1.3.0...v2.0.0)
+
+### Fixed
+
+- fix idempotency for empty environment [#85](https://github.com/puppetlabs/puppetlabs-cron_core/pull/85) ([mhashizume](https://github.com/mhashizume))
+- fix idempotency for empty environment [#77](https://github.com/puppetlabs/puppetlabs-cron_core/pull/77) ([Dan33l](https://github.com/Dan33l))
+
+### Other
+
+- (PA-6856) Add beaker-hostgenerator gem with dynamic version support [#83](https://github.com/puppetlabs/puppetlabs-cron_core/pull/83) ([skyamgarp](https://github.com/skyamgarp))
+- (PA-7366) Update testing to use puppetcore [#81](https://github.com/puppetlabs/puppetlabs-cron_core/pull/81) ([tvpartytonight](https://github.com/tvpartytonight))
+- (PA-7215) Add Amazonfips as a supported platform [#79](https://github.com/puppetlabs/puppetlabs-cron_core/pull/79) ([shubhamshinde360](https://github.com/shubhamshinde360))
+- (PA-6139) Drop beaker-puppet_install_helper gem in cron-core module [#76](https://github.com/puppetlabs/puppetlabs-cron_core/pull/76) ([amitkarsale](https://github.com/amitkarsale))
+
 ## [v1.3.0](https://github.com/puppetlabs/puppetlabs-cron_core/tree/v1.3.0) - 2024-03-06
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/v1.2.1...v1.3.0)
