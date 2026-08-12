@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v2.0.3](https://github.com/puppetlabs/puppetlabs-cron_core/tree/v2.0.3) - 2026-08-12
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/v2.0.2...v2.0.3)
+
+### Fixed
+
+- (PE-45112) Don't use =~ on non-String in CronParam#numfix and update spec tests [#94](https://github.com/puppetlabs/puppetlabs-cron_core/pull/94) ([AriaXLi](https://github.com/AriaXLi))
+
 ## [v2.0.2](https://github.com/puppetlabs/puppetlabs-cron_core/tree/v2.0.2) - 2025-12-02
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-cron_core/compare/v2.0.1...v2.0.2)
