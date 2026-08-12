@@ -86,6 +86,10 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', minute: '59') }.not_to raise_error
       end
 
+      it 'supports a bare Integer value' do
+        expect { described_class.new(name: 'foo', minute: 36) }.not_to raise_error
+      end
+
       it 'does not support non numeric characters' do
         expect { described_class.new(name: 'foo', minute: 'z59') }.to raise_error(Puppet::Error, %r{z59 is not a valid minute})
         expect { described_class.new(name: 'foo', minute: '5z9') }.to raise_error(Puppet::Error, %r{5z9 is not a valid minute})

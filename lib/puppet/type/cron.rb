@@ -73,11 +73,10 @@ Puppet::Type.newtype(:cron) do
     # in string form to actual integers, and returns the value if it's
     # an integer or false if it's just a normal string.
     def numfix(num)
-      if num.is_a?(Integer) || num =~ %r{^\d+$}
-        num
-      else
-        false
-      end
+      return false unless num.is_a?(Integer) || num.is_a?(String)
+
+      # Ensure num is a string before checking against regex & allow leading zeros
+      ((num.is_a?(String) && %r{^\d+$}.match?(num)) || Integer(num, exception: false)) ? num : false
     end
 
     # Verify that a number is within the specified limits.  Return the
