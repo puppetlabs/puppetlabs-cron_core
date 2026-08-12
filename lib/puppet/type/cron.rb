@@ -89,6 +89,8 @@ Puppet::Type.newtype(:cron) do
     # insensitive matching, and supports matching either the entire word
     # or the first three letters of the word.
     def alphacheck(value, ary)
+      return false unless value.is_a?(String)
+
       tmp = value.downcase
 
       # If they specified a shortened version of the name, then see
@@ -321,7 +323,7 @@ Puppet::Type.newtype(:cron) do
       the crontab, like `PATH=/bin:/usr/bin:/usr/sbin`."
 
     validate do |value|
-      unless value =~ %r{^\s*(\w+)\s*=\s*(.*)\s*$} || value == :absent || value == 'absent'
+      unless (value.is_a?(String) && value =~ %r{^\s*(\w+)\s*=\s*(.*)\s*$}) || value == :absent || value == 'absent'
         raise ArgumentError, _('Invalid environment setting %{value}') % { value: value.inspect }
       end
     end
