@@ -86,6 +86,19 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', minute: '59') }.not_to raise_error
       end
 
+      it 'supports a bare Integer value' do
+        expect { described_class.new(name: 'foo', minute: 36) }.not_to raise_error
+      end
+
+      it 'does not support float values' do
+        expect { described_class.new(name: 'foo', minute: 36.0) }.to raise_error(Puppet::Error, %r{36\.0 is not a valid minute})
+      end
+
+      it 'supports leading zeros followed by 8 or 9' do
+        expect { described_class.new(name: 'foo', minute: '08') }.not_to raise_error
+        expect { described_class.new(name: 'foo', minute: '09') }.not_to raise_error
+      end
+
       it 'does not support non numeric characters' do
         expect { described_class.new(name: 'foo', minute: 'z59') }.to raise_error(Puppet::Error, %r{z59 is not a valid minute})
         expect { described_class.new(name: 'foo', minute: '5z9') }.to raise_error(Puppet::Error, %r{5z9 is not a valid minute})
@@ -167,6 +180,10 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', hour: 'z15') }.to raise_error(Puppet::Error, %r{z15 is not a valid hour})
         expect { described_class.new(name: 'foo', hour: '1z5') }.to raise_error(Puppet::Error, %r{1z5 is not a valid hour})
         expect { described_class.new(name: 'foo', hour: '15z') }.to raise_error(Puppet::Error, %r{15z is not a valid hour})
+      end
+
+      it 'does not support float values' do
+        expect { described_class.new(name: 'foo', hour: 36.0) }.to raise_error(Puppet::Error, %r{36\.0 is not a valid hour})
       end
 
       it 'does not support single values out of range' do
@@ -266,6 +283,10 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
 
       it 'does not support invalid weekday names' do
         expect { described_class.new(name: 'foo', weekday: 'Sar') }.to raise_error(Puppet::Error, %r{Sar is not a valid weekday})
+      end
+
+      it 'does not support float values' do
+        expect { described_class.new(name: 'foo', weekday: 3.0) }.to raise_error(Puppet::Error, %r{3\.0 is not a valid weekday})
       end
 
       it 'supports valid multiple values' do
@@ -368,6 +389,10 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', month: 'Jal') }.to raise_error(Puppet::Error, %r{Jal is not a valid month})
       end
 
+      it 'does not support float values' do
+        expect { described_class.new(name: 'foo', month: 6.0) }.to raise_error(Puppet::Error, %r{6\.0 is not a valid month})
+      end
+
       it 'does not support single values out of range' do
         expect { described_class.new(name: 'foo', month: '-1') }.to raise_error(Puppet::Error, %r{-1 is not a valid month})
         expect { described_class.new(name: 'foo', month: '60') }.to raise_error(Puppet::Error, %r{60 is not a valid month})
@@ -441,6 +466,10 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect { described_class.new(name: 'foo', monthday: 'z23') }.to raise_error(Puppet::Error, %r{z23 is not a valid monthday})
         expect { described_class.new(name: 'foo', monthday: '2z3') }.to raise_error(Puppet::Error, %r{2z3 is not a valid monthday})
         expect { described_class.new(name: 'foo', monthday: '23z') }.to raise_error(Puppet::Error, %r{23z is not a valid monthday})
+      end
+
+      it 'does not support float values' do
+        expect { described_class.new(name: 'foo', monthday: 15.0) }.to raise_error(Puppet::Error, %r{15\.0 is not a valid monthday})
       end
 
       it 'does not support single values out of range' do
@@ -545,6 +574,12 @@ describe Puppet::Type.type(:cron), unless: Puppet.features.microsoft_windows? do
         expect {
           described_class.new(name: 'foo', environment: 'absent')
         }.not_to raise_error
+      end
+
+      it 'does not accept non-string environment values' do
+        expect {
+          described_class.new(name: 'foo', environment: 5)
+        }.to raise_error(Puppet::Error, %r{Invalid environment setting})
       end
     end
   end

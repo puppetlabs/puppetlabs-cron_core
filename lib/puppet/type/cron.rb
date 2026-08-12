@@ -73,11 +73,10 @@ Puppet::Type.newtype(:cron) do
     # in string form to actual integers, and returns the value if it's
     # an integer or false if it's just a normal string.
     def numfix(num)
-      if num.is_a?(Integer) || num =~ %r{^\d+$}
-        num
-      else
-        false
-      end
+      return false unless num.is_a?(Integer) || num.is_a?(String)
+
+      # Ensure num is a string before checking against regex & allow leading zeros
+      ((num.is_a?(String) && %r{^\d+$}.match?(num)) || Integer(num, exception: false)) ? num : false
     end
 
     # Verify that a number is within the specified limits.  Return the
@@ -90,6 +89,8 @@ Puppet::Type.newtype(:cron) do
     # insensitive matching, and supports matching either the entire word
     # or the first three letters of the word.
     def alphacheck(value, ary)
+      return false unless value.is_a?(String)
+
       tmp = value.downcase
 
       # If they specified a shortened version of the name, then see
@@ -322,7 +323,7 @@ Puppet::Type.newtype(:cron) do
       the crontab, like `PATH=/bin:/usr/bin:/usr/sbin`."
 
     validate do |value|
-      unless value =~ %r{^\s*(\w+)\s*=\s*(.*)\s*$} || value == :absent || value == 'absent'
+      unless (value.is_a?(String) && value =~ %r{^\s*(\w+)\s*=\s*(.*)\s*$}) || value == :absent || value == 'absent'
         raise ArgumentError, _('Invalid environment setting %{value}') % { value: value.inspect }
       end
     end
