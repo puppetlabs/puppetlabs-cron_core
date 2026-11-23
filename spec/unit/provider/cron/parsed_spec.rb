@@ -330,4 +330,121 @@ describe Puppet::Type.type(:cron).provider(:crontab) do
       end
     end
   end
+
+  describe 'when setting a time field on a record with a special schedule (#100)' do
+    let(:target) { 'nobody' }
+    let(:special_record) { { record_type: :crontab, name: 'special', special: 'daily', minute: :absent, hour: :absent, monthday: :absent, month: :absent, weekday: :absent, command: '/bin/true', target: } }
+    let(:special_provider) { described_class.new(special_record.dup) }
+
+    # to_file runs the record through pre_gen and to_line, like a real flush
+    def generated_line(provider)
+      described_class.to_file([provider.property_hash]).lines.grep(%r{/bin/true}).first.chomp
+    end
+
+    before(:each) do
+      allow(described_class).to receive(:header).and_return ''
+      # marking a target as modified is class level state that would otherwise
+      # leak into other examples and make them write the target
+      allow(described_class).to receive(:modified)
+    end
+
+    it 'defines the time field setters on the provider itself rather than the generic ones' do
+      described_class::TIME_FIELDS.each do |field|
+        expect(described_class.instance_method(:"#{field}=").owner).to eq(described_class)
+        expect(described_class.instance_method(:"#{field}=").source_location.first).to end_with('crontab.rb')
+      end
+    end
+
+    {
+      minute: [['8'], '8 * * * * /bin/true'],
+      hour: [['4'], '* 4 * * * /bin/true'],
+      monthday: [['15'], '* * 15 * * /bin/true'],
+      month: [['6'], '* * * 6 * /bin/true'],
+      weekday: [['2'], '* * * * 2 /bin/true'],
+    }.each do |field, (value, expected_line)|
+      context "with #{field}" do
+        it 'clears the special schedule when given a real value' do
+          special_provider.send(:"#{field}=", value)
+          expect(special_provider.property_hash[:special]).to eq(:absent)
+          expect(special_provider.property_hash[field]).to eq(value)
+        end
+
+        it 'generates a numeric crontab line after the special schedule was cleared' do
+          expect(generated_line(special_provider)).to eq('@daily /bin/true')
+          special_provider.send(:"#{field}=", value)
+          expect(generated_line(special_provider)).to eq(expected_line)
+        end
+
+        it 'marks the target as modified' do
+          expect(described_class).to receive(:modified).with(target)
+          special_provider.send(:"#{field}=", value)
+        end
+
+        it 'keeps the special schedule when set to :absent' do
+          special_provider.send(:"#{field}=", :absent)
+          expect(special_provider.property_hash[:special]).to eq('daily')
+          expect(special_provider.property_hash[field]).to eq(:absent)
+          expect(generated_line(special_provider)).to eq('@daily /bin/true')
+        end
+
+        it "keeps the special schedule when set to 'absent'" do
+          special_provider.send(:"#{field}=", 'absent')
+          expect(special_provider.property_hash[:special]).to eq('daily')
+        end
+
+        it 'keeps the special schedule when set to an empty array' do
+          special_provider.send(:"#{field}=", [])
+          expect(special_provider.property_hash[:special]).to eq('daily')
+        end
+      end
+    end
+
+    it 'clears the special schedule when given an array with several values' do
+      special_provider.minute = ['0', '15', '30']
+      expect(special_provider.property_hash[:special]).to eq(:absent)
+      expect(generated_line(special_provider)).to eq('0,15,30 * * * * /bin/true')
+    end
+
+    it 'clears the special schedule when given a single non-array value' do
+      special_provider.hour = '4'
+      expect(special_provider.property_hash[:special]).to eq(:absent)
+    end
+
+    it 'logs that the special schedule is being cleared' do
+      expect(Puppet).to receive(:info).with(%r{Clearing special schedule 'daily' for special because minute is now managed})
+      special_provider.minute = ['8']
+    end
+
+    it 'does not log when no special schedule is present' do
+      numeric_provider = described_class.new(special_record.merge(special: :absent))
+      expect(Puppet).not_to receive(:info)
+      numeric_provider.minute = ['8']
+    end
+
+    it 'keeps all values when several fields are set one after another' do
+      special_provider.minute = ['8']
+      special_provider.hour = ['4']
+      expect(special_provider.property_hash[:special]).to eq(:absent)
+      expect(generated_line(special_provider)).to eq('8 4 * * * /bin/true')
+    end
+
+    it 'does not touch the special schedule when setting special itself' do
+      special_provider.special = 'weekly'
+      expect(special_provider.property_hash[:special]).to eq('weekly')
+      expect(generated_line(special_provider)).to eq('@weekly /bin/true')
+    end
+
+    it 'leaves a record without a special schedule alone' do
+      numeric_provider = described_class.new(special_record.merge(special: :absent, minute: ['1']))
+      numeric_provider.minute = ['8']
+      expect(numeric_provider.property_hash[:special]).to eq(:absent)
+      expect(generated_line(numeric_provider)).to eq('8 * * * * /bin/true')
+    end
+
+    it 'does not fail for a record that has no special key' do
+      bare_provider = described_class.new(record_type: :crontab, command: '/bin/true', target:)
+      expect { bare_provider.minute = ['8'] }.not_to raise_error
+      expect(bare_provider.property_hash[:minute]).to eq(['8'])
+    end
+  end
 end
