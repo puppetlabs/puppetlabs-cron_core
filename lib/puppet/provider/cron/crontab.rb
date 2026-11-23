@@ -263,6 +263,28 @@ Puppet::Type.type(:cron).provide(:crontab, parent: Puppet::Provider::ParsedFile,
     @property_hash[:user] || @property_hash[:target]
   end
 
+  # A numeric time field and a special schedule are mutually exclusive in a
+  # crontab line, and to_line gives the special schedule priority. When a time
+  # field is set to a real value on a record that currently has a special
+  # schedule (e.g. @daily) and the special property is not managed, the special
+  # schedule must be dropped, otherwise the new value would never be written
+  # and the resource would be out of sync on every run (#100).
+  #
+  # Setting a field to :absent ('*') is not a real value and leaves the special
+  # schedule alone.
+  self::TIME_FIELDS.each do |field|
+    define_method(:"#{field}=") do |value|
+      mark_target_modified
+      @property_hash[field] = value
+
+      clearing = Array(value).flatten.any? { |v| ![:absent, 'absent'].include?(v) }
+      if clearing && @property_hash[:special] && @property_hash[:special] != :absent
+        Puppet.info _("Clearing special schedule '%{special}' for %{name} because %{field} is now managed") % { special: @property_hash[:special], name: @property_hash[:name], field: }
+        @property_hash[:special] = :absent
+      end
+    end
+  end
+
   CRONTAB_DIR = case Facter.value('os.family')
                 when 'Debian', 'HP-UX', 'Solaris'
                   '/var/spool/cron/crontabs'

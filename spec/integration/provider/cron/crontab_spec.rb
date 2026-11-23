@@ -233,5 +233,183 @@ describe Puppet::Type.type(:cron).provider(:crontab), unless: Puppet.features.mi
         expect(File.read(crontab_user2)).to eq(File.read(my_fixture('moved_cronjob_input2')))
       end
     end
+
+    # https://github.com/puppetlabs/puppetlabs-cron_core/issues/100
+    describe 'when changing a special schedule to numeric fields without managing special' do
+      def daily_failure_manifest(attributes)
+        params = attributes.map { |name, value| "#{name} => #{value.inspect}," }.join("\n")
+        <<-MANIFEST
+        cron {
+          'My daily failure':
+            command => '/bin/false',
+            target  => '#{crontab_user1}',
+            #{params}
+        }
+        MANIFEST
+      end
+
+      # Applies the manifest a second time against what was written by the first run
+      def reapply(manifest)
+        described_class.clear
+        apply_with_error_check(manifest)
+      end
+
+      def changed_resources(transaction)
+        transaction.report.resource_statuses.values.select(&:changed).map(&:resource)
+      end
+
+      it 'replaces @daily with the numeric schedule' do
+        manifest = daily_failure_manifest(minute: '8', hour: '4')
+        transaction = apply_with_error_check(manifest)
+        expect(changed_resources(transaction)).to eq(['Cron[My daily failure]'])
+        expect_output('special_to_numeric')
+      end
+
+      it 'is idempotent' do
+        manifest = daily_failure_manifest(minute: '8', hour: '4')
+        apply_with_error_check(manifest)
+
+        transaction = reapply(manifest)
+        expect(changed_resources(transaction)).to be_empty
+        expect(transaction.report.resource_statuses['Cron[My daily failure]'].events).to be_empty
+        expect_output('special_to_numeric')
+      end
+
+      it 'works with array values' do
+        apply_with_error_check(daily_failure_manifest(minute: ['0', '30'], hour: ['4']))
+        expect(File.read(crontab_user1)).to eq(File.read(my_fixture('crontab_user1')).sub('@daily /bin/false', '0,30 4 * * * /bin/false'))
+      end
+
+      it 'works with named, range and step values and is idempotent' do
+        manifest = daily_failure_manifest(minute: '*/15', hour: '1-5', month: 'jan', weekday: 'monday')
+        apply_with_error_check(manifest)
+        expect(File.read(crontab_user1)).to eq(File.read(my_fixture('crontab_user1')).sub('@daily /bin/false', '*/15 1-5 * 1 1 /bin/false'))
+
+        transaction = reapply(manifest)
+        expect(changed_resources(transaction)).to be_empty
+      end
+
+      it 'leaves the other entries, comments and environment lines untouched' do
+        apply_with_error_check(daily_failure_manifest(minute: '8', hour: '4'))
+        original = File.read(my_fixture('crontab_user1'))
+        result = File.read(crontab_user1)
+        expect(result.lines - original.lines).to eq(["8 4 * * * /bin/false\n"])
+        expect(original.lines - result.lines).to eq(["@daily /bin/false\n"])
+        expect(result).to include('@daily /bin/unnamed_special_command', 'MAILTO=""', 'SHELL=/bin/sh')
+      end
+
+      {
+        minute: ['8', '8 * * * *'],
+        hour: ['4', '* 4 * * *'],
+        monthday: ['15', '* * 15 * *'],
+        month: ['6', '* * * 6 *'],
+        weekday: ['2', '* * * * 2'],
+      }.each do |field, (value, schedule)|
+        context "with only #{field}" do
+          let(:manifest) { daily_failure_manifest(field => value) }
+
+          it 'replaces @daily and leaves the other fields as *' do
+            apply_with_error_check(manifest)
+            expect(File.read(crontab_user1)).to eq(File.read(my_fixture('crontab_user1')).sub('@daily /bin/false', "#{schedule} /bin/false"))
+          end
+
+          it 'is idempotent' do
+            apply_with_error_check(manifest)
+            transaction = reapply(manifest)
+            expect(changed_resources(transaction)).to be_empty
+            expect(File.read(crontab_user1)).to eq(File.read(my_fixture('crontab_user1')).sub('@daily /bin/false', "#{schedule} /bin/false"))
+          end
+        end
+      end
+
+      it 'does not clear the special schedule when a field is managed as absent' do
+        transaction = apply_with_error_check(daily_failure_manifest(minute: 'absent'))
+        expect(changed_resources(transaction)).to be_empty
+        expect_output('crontab_user1')
+      end
+
+      it "does not clear the special schedule when a field is managed as '*'" do
+        transaction = apply_with_error_check(daily_failure_manifest(minute: '*', hour: '*'))
+        expect(changed_resources(transaction)).to be_empty
+        expect_output('crontab_user1')
+      end
+
+      it 'does not touch the special schedule when no time field is managed' do
+        transaction = apply_with_error_check(daily_failure_manifest({}))
+        expect(changed_resources(transaction)).to be_empty
+        expect_output('crontab_user1')
+      end
+
+      it 'still converts to numeric when special is explicitly absent' do
+        apply_with_error_check(daily_failure_manifest(special: 'absent'))
+        expect_output('unspecialized')
+      end
+
+      it 'still converts to numeric when special is explicitly absent and fields are given' do
+        apply_with_error_check(daily_failure_manifest(special: 'absent', minute: '8', hour: '4'))
+        expect_output('special_to_numeric')
+      end
+
+      it 'still changes one special schedule to another' do
+        apply_with_error_check(daily_failure_manifest(special: 'weekly'))
+        expect_output('special_to_other_special')
+
+        transaction = reapply(daily_failure_manifest(special: 'weekly'))
+        expect(changed_resources(transaction)).to be_empty
+      end
+
+      it 'still changes a numeric schedule to a special one and back to a numeric one' do
+        monthly = <<-MANIFEST
+        cron {
+          'Monthly job':
+            special => 'weekly',
+            command => '$HOME/bin/monthly',
+            target  => '#{crontab_user1}',
+        }
+        MANIFEST
+        apply_with_error_check(monthly)
+        expect(File.read(crontab_user1)).to eq(File.read(my_fixture('crontab_user1')).sub('15 14 1 * * $HOME/bin/monthly', '@weekly $HOME/bin/monthly'))
+
+        # and back again, without managing special
+        described_class.clear
+        apply_with_error_check(<<-MANIFEST)
+        cron {
+          'Monthly job':
+            minute  => '15',
+            hour    => '14',
+            monthday => '1',
+            command => '$HOME/bin/monthly',
+            target  => '#{crontab_user1}',
+        }
+        MANIFEST
+        expect_output('crontab_user1')
+      end
+    end
+
+    describe 'when changing a field of an existing numeric schedule' do
+      let(:manifest) do
+        <<-MANIFEST
+        cron {
+          'Monthly job':
+            minute  => '30',
+            command => '$HOME/bin/monthly',
+            target  => '#{crontab_user1}',
+        }
+        MANIFEST
+      end
+
+      it 'changes only that field' do
+        apply_with_error_check(manifest)
+        expect_output('modify_numeric_minute')
+      end
+
+      it 'is idempotent' do
+        apply_with_error_check(manifest)
+        described_class.clear
+        transaction = apply_with_error_check(manifest)
+        expect(transaction.report.resource_statuses.values.select(&:changed)).to be_empty
+        expect_output('modify_numeric_minute')
+      end
+    end
   end
 end
